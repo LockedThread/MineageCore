@@ -1,0 +1,74 @@
+vouchers:
+  protein:
+    commands:
+      - '@broadcast {player} has won a protein tag!'
+    item:
+      name: '&cProtein'
+      material: 'NAME_TAG'
+      lore:
+        - '&eRight click to redeem the Protein tag'
+broadcasts:
+  0:
+    - ''
+    - '&8[&e&lMineage&6&lPVP&8] &eMake sure to donate to the server by doing /buy to support the server and receive AWESOME perks.'
+    - ''
+  1:
+    - ''
+    - '&8[&e&lMineage&6&lPVP&8] &eWe are currently accepting applications, go onto the discord and join the application server.'
+    - ''
+  2:
+    - ''
+    - '&8[&e&lMineage&6&lPVP&8] &eIf you need a faction feel free to ask in the &e&lMineage&6&lPVP &ediscord, https://discord.gg/75sCqV.'
+    - ''
+faction-collectors:
+  collector-item:
+    name: '&bFaction Collector'
+    enchanted: true
+    lore:
+      - '&ePlace this down in your claims to start collecting mobs.'
+  sellwand-item:
+    name: '&eSell Wand'
+    material: 'DIAMOND_HOE'
+    enchanted: true
+    lore:
+      - '&eRight click a collector to sell all of the mobs.'
+  gui:
+    items:
+      info:
+        name: '&5INFO'
+        material: 'BOOK'
+        lore:
+          - '&fThis is a faction collector.'
+      locked:
+        name: '&e&l(!) &f{mob} &e&l(!)'
+        lore:
+          - '&cThis collection type is locked, upgrade your collector to unlock it.'
+      collection-type-format:
+        name: '&e&l(!) &f{mob} &e&l(!)'
+        lore:
+          - '&eYou have &c{amount} &eavailable to sell.'
+      upgrade:
+        name: '&dUpgrade'
+        material: 'DIAMOND_BLOCK'
+        lore:
+          - '&eClick to upgrade to level {level} for ${price}'
+      max-upgrade:
+        name: '&dUpgrade'
+        material: 'BEDROCK'
+        lore:
+          - '&cMaximum upgrade reached!'
+sell-values:
+  chicken: 3.0
+  pig-zombie: 17.0
+  enderman: 14.0
+  cow: 8.0
+  pig: 5.0
+  villager: 20.0
+  iron-golem: 25.0
+  witch: 20.0
+  cactus: 2.0
+  sugar-cane: 4.0
+upgrade-prices:
+  1: 100000.0
+  2: 250000.0
+  3: 500000.0
