@@ -7,6 +7,7 @@ import me.lucko.helper.Schedulers;
 import me.lucko.helper.plugin.ExtendedJavaPlugin;
 import me.lucko.helper.plugin.ap.Plugin;
 import me.lucko.helper.plugin.ap.PluginDependency;
+import me.lucko.helper.scoreboard.PacketScoreboardProvider;
 import net.brcdev.shopgui.ShopGuiPlugin;
 import net.milkbowl.vault.economy.Economy;
 import org.apache.commons.lang3.StringUtils;
@@ -34,7 +35,9 @@ import java.util.stream.Collectors;
                 @PluginDependency(value = "Factions"),
                 @PluginDependency(value = "MassiveCore"),
                 @PluginDependency(value = "WorldGuard"),
-                @PluginDependency("ShopGUIPlus")})
+                @PluginDependency("ShopGUIPlus"),
+                @PluginDependency("ProtocolLib"),
+                @PluginDependency("helper")})
 public final class MineageCore extends ExtendedJavaPlugin {
 
     public static final String SERVER_PREFIX = "&8[&e&lMineage&6&lPVP&8] ";
@@ -44,6 +47,7 @@ public final class MineageCore extends ExtendedJavaPlugin {
     private ThreadLocalRandom random = ThreadLocalRandom.current();
     private GenerationTask generationTask;
     private EnumMap<Material, Double> prices;
+    private PacketScoreboardProvider packetScoreboardProvider;
 
     public static MineageCore getInstance() {
         return getPlugin(MineageCore.class);
@@ -99,6 +103,8 @@ public final class MineageCore extends ExtendedJavaPlugin {
                     }
                 });
 
+        this.packetScoreboardProvider = provideService(PacketScoreboardProvider.class, new PacketScoreboardProvider(this));
+
         bindModule(new ModuleSilkSpawner());
         bindModule(new ModuleJellyLegs());
         bindModule(new ModuleNightVision());
@@ -148,5 +154,9 @@ public final class MineageCore extends ExtendedJavaPlugin {
 
     public EnumMap<Material, Double> getPrices() {
         return prices;
+    }
+
+    public PacketScoreboardProvider getPacketScoreboardProvider() {
+        return packetScoreboardProvider;
     }
 }
