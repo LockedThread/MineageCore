@@ -9,12 +9,11 @@ import org.bukkit.Bukkit;
 import rip.simpleness.mineagecore.MineageCore;
 
 import javax.annotation.Nonnull;
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.ArrayList;
 
 public class ModuleAutoBroadcast implements TerminableModule {
 
-    private HashSet<String[]> broadcasts = new HashSet<>();
+    private ArrayList<String[]> broadcasts = new ArrayList<>();
 
     @Override
     public void setup(@Nonnull TerminableConsumer terminableConsumer) {
@@ -22,8 +21,10 @@ public class ModuleAutoBroadcast implements TerminableModule {
             broadcasts.add(MineageCore.getInstance().getConfig().getStringList(key).toArray(new String[0]));
         }
 
-        Schedulers.async().runRepeating(() -> Arrays.stream(RandomSelector.uniform(broadcasts).pick())
-                .map(Text::colorize)
-                .forEach(Bukkit::broadcastMessage), 0L, 12000L);
+        Schedulers.async().runRepeating(() -> {
+            for (String s : RandomSelector.uniform(broadcasts).pick()) {
+                Bukkit.broadcastMessage(Text.colorize(s));
+            }
+        }, 0L, 12000L);
     }
 }

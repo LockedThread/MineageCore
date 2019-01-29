@@ -22,7 +22,6 @@ import rip.simpleness.mineagecore.objs.Generation;
 
 import javax.annotation.Nonnull;
 import java.util.UUID;
-import java.util.function.BiConsumer;
 
 public class ModuleGenBlock implements TerminableModule {
 
