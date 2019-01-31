@@ -1,3 +1,16 @@
+scoreboard:
+  display-name: '&f» &e&lMineage&6&lPVP &f«'
+  lines:
+    - '&6&l__________________'
+    - '&6Balance:'
+    - '&f» &e$%vault_eco_balance_fixed%'
+    - ''
+    - '&6TPS:'
+    - '&f» &e%server_tps%'
+    - ''
+    - '&6Discord:'
+    - '&f» &ediscord.gg/eMhFHSp'
+    - '&6&l__________________'
 vouchers:
   protein:
     commands:

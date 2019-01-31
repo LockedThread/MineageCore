@@ -1,17 +1,16 @@
 package rip.simpleness.mineagecore.modules;
 
-import com.google.common.collect.ImmutableList;
+import com.massivecraft.factions.entity.MPlayer;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.lucko.helper.Events;
 import me.lucko.helper.Schedulers;
-import me.lucko.helper.config.objectmapping.Setting;
-import me.lucko.helper.config.objectmapping.serialize.ConfigSerializable;
 import me.lucko.helper.metadata.Metadata;
 import me.lucko.helper.metadata.MetadataKey;
 import me.lucko.helper.scoreboard.PacketScoreboard;
 import me.lucko.helper.scoreboard.ScoreboardObjective;
 import me.lucko.helper.terminable.TerminableConsumer;
 import me.lucko.helper.terminable.module.TerminableModule;
+import me.lucko.helper.text.Text;
 import me.lucko.helper.utils.Players;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -22,22 +21,28 @@ import rip.simpleness.mineagecore.MineageCore;
 import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 public class ModuleScoreboard implements TerminableModule {
 
     private static final MetadataKey<ScoreboardObjective> SCOREBOARD_OBJECTIVE_METADATA_KEY = MetadataKey.create("scoreboard", ScoreboardObjective.class);
     private static final MineageCore INSTANCE = MineageCore.getInstance();
     private PacketScoreboard scoreboard;
-    private ScoreboardConfig scoreboardConfig;
+    private List<String> scoreboardLines;
+    private String scoreboardDisplayName;
 
     @Override
     public void setup(@Nonnull TerminableConsumer terminableConsumer) {
         this.scoreboard = INSTANCE.getPacketScoreboardProvider().getScoreboard();
-        this.scoreboardConfig = INSTANCE.setupConfig("scoreboard.yml", new ScoreboardConfig());
+        this.scoreboardLines = INSTANCE.getConfig().getStringList("scoreboard.lines").stream().map(Text::colorize).collect(Collectors.toList());
+        this.scoreboardDisplayName = Text.colorize(INSTANCE.getConfig().getString("scoreboard.display-name"));
 
         BiConsumer<Player, ScoreboardObjective> updater = (player, scoreboardObjective) -> {
-            scoreboardObjective.setDisplayName(scoreboardConfig.displayName);
-            scoreboardObjective.applyLines(PlaceholderAPI.setPlaceholders(player, scoreboardConfig.lines));
+            final MPlayer mPlayer = MPlayer.get(player);
+            scoreboardObjective.setDisplayName(scoreboardDisplayName);
+            scoreboardObjective.applyLines(PlaceholderAPI.setPlaceholders(player, scoreboardLines.stream()
+                    .map(s -> s.replace("{factions_name}", mPlayer.getFaction().isNone() ? "&2Wilderness" : mPlayer.getFaction().getName()))
+                    .collect(Collectors.toList())));
         };
 
         Events.subscribe(PlayerJoinEvent.class)
@@ -57,18 +62,5 @@ public class ModuleScoreboard implements TerminableModule {
                 updater.accept(player, scoreboardObjective);
             }
         }), 20L, 20L);
-    }
-
-    @ConfigSerializable
-    private class ScoreboardConfig {
-
-        @Setting(value = "display-name")
-        private String displayName = "&e&lMineage&6&lPVP";
-
-        @Setting(value = "lines")
-        private List<String> lines = ImmutableList.of(
-                "Line 1",
-                "Line 2"
-        );
     }
 }
