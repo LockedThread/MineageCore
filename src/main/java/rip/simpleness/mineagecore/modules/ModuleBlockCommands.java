@@ -22,7 +22,7 @@ public class ModuleBlockCommands implements TerminableModule {
                 .filter(event -> !event.getPlayer().hasPermission("mineagepvp.admin"))
                 .handler(event -> {
                     String root = event.getMessage().split(" ")[0];
-                    if (blockedCommands.contains(root) || root.contains(":") || root.contains("/minecraft") || root.contains("/bukkit")) {
+                    if (blockedCommands.contains(root) || root.contains(":") || root.contains("/minecraft") || root.contains("/bukkit") || root.contains("version") || root.contains("tps") || root.contains("fps")) {
                         event.setCancelled(true);
                         event.getPlayer().sendMessage(Text.colorize(MineageCore.SERVER_PREFIX + "&cNo no no...."));
                     }
