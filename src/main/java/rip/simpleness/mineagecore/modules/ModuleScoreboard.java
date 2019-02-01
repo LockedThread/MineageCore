@@ -57,10 +57,7 @@ public class ModuleScoreboard implements TerminableModule {
                 .handler(event -> Metadata.provideForPlayer(event.getPlayer()).remove(SCOREBOARD_OBJECTIVE_METADATA_KEY)).bindWith(terminableConsumer);
 
         Schedulers.async().runRepeating(() -> Players.all().forEach(player -> {
-            ScoreboardObjective scoreboardObjective = Metadata.provideForPlayer(player).getOrNull(SCOREBOARD_OBJECTIVE_METADATA_KEY);
-            if (scoreboardObjective != null) {
-                updater.accept(player, scoreboardObjective);
-            }
-        }), 20L, 20L);
+            updater.accept(player, Metadata.provideForPlayer(player).getOrNull(SCOREBOARD_OBJECTIVE_METADATA_KEY));
+        }), 200L, 200L);
     }
 }
