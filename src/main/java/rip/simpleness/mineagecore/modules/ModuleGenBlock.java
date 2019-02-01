@@ -49,6 +49,7 @@ public class ModuleGenBlock implements TerminableModule {
                             Player player = event.getPlayer();
                             if (MineageCore.getInstance().getEconomy().getBalance(player) < genBlock.getPrice()) {
                                 player.sendMessage(Text.colorize("&cYou don't have enough money to place this genblock!"));
+                                event.setCancelled(true);
                             } else {
                                 MineageCore.getInstance().getEconomy().withdrawPlayer(player, genBlock.getPrice());
                                 BlockFace blockFace = genBlock.getDirection().toBlockFace();
