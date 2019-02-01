@@ -10,15 +10,22 @@ import rip.simpleness.mineagecore.enums.Direction;
 
 public final class GenBlock {
 
-    private Material material;
-    private Direction direction;
-    private double price;
+    private final boolean patch;
+    private final Material material;
+    private final Direction direction;
+    private final double price;
 
     public GenBlock(Material material, Direction direction, double price) {
+        this(material, direction, price, false);
+    }
+
+    public GenBlock(Material material, Direction direction, double price, boolean patch) {
         this.material = material;
         this.direction = direction;
         this.price = price;
+        this.patch = patch;
     }
+
 
     public Material getMaterial() {
         return material;
@@ -62,5 +69,9 @@ public final class GenBlock {
 
     public double getPrice() {
         return price;
+    }
+
+    public boolean isPatch() {
+        return patch;
     }
 }
