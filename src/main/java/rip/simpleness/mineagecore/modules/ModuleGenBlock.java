@@ -28,8 +28,8 @@ public class ModuleGenBlock implements TerminableModule {
             .put("vertical-obsidian", new GenBlock(Material.OBSIDIAN, Direction.DOWN, 2500))
             .put("horizontal-obsidian", new GenBlock(Material.OBSIDIAN, Direction.HORIZONTAL, 3000))
             .put("vertical-sand", new GenBlock(Material.SAND, Direction.UP, 2500))
-            .put("vertical-cobblestone-patch", new GenBlock(Material.COBBLESTONE, Direction.DOWN, 250, true))
-            .put("vertical-obsidian-patch", new GenBlock(Material.COBBLESTONE, Direction.DOWN, 250, true))
+            .put("vertical-cobblestone-patch", new GenBlock(Material.COBBLESTONE, Direction.DOWN, 1000, true))
+            .put("vertical-obsidian-patch", new GenBlock(Material.OBSIDIAN, Direction.DOWN, 2500, true))
             .put("vertical-sand-cannon", new GenBlock(Material.SAND, Direction.UP, 5000, true))
             .build();
 
