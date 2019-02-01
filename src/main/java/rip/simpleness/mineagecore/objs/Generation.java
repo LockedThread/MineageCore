@@ -41,11 +41,17 @@ public final class Generation {
                             return false;
                         }
                         final Block relative = currentBlockPosition.toBlock().getRelative(blockFace);
-                        if (genBlock.isPatch() && relative.getType() == Material.AIR) {
+                        if (genBlock.isPatch() && (relative.getType() == Material.AIR || (relative.getType() == Material.STATIONARY_WATER || relative.getType() == Material.WATER))) {
                             if (length >= 500) {
                                 return false;
                             } else {
-                                Schedulers.sync().run(() -> ((CraftBlock) relative).setTypeIdAndData(genBlock.getMaterial().getId(), (byte) 0, false));
+                                Schedulers.sync().run(() -> {
+                                    if (relative.getType() == Material.WATER) {
+                                        relative.setType(genBlock.getMaterial());
+                                    } else {
+                                        ((CraftBlock) relative).setTypeIdAndData(genBlock.getMaterial().getId(), (byte) 0, false);
+                                    }
+                                });
                                 currentBlockPosition = BlockPosition.of(relative);
                                 length++;
                                 return true;
