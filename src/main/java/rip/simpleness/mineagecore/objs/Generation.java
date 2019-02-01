@@ -44,12 +44,11 @@ public final class Generation {
                         if (genBlock.isPatch() && (relative.getType() == Material.AIR || (relative.getType() == Material.STATIONARY_WATER || relative.getType() == Material.WATER))) {
                             if (length >= 500) {
                                 return false;
-                            } else {
-                                Schedulers.sync().run(() -> ((CraftBlock) relative).setTypeIdAndData(genBlock.getMaterial().getId(), (byte) 0, relative.getType() == Material.WATER));
-                                currentBlockPosition = BlockPosition.of(relative);
-                                length++;
-                                return true;
                             }
+                            Schedulers.sync().run(() -> ((CraftBlock) relative).setTypeIdAndData(genBlock.getMaterial().getId(), (byte) 0, relative.getType() == Material.WATER));
+                            currentBlockPosition = BlockPosition.of(relative);
+                            length++;
+                            return true;
                         }
                         if (relative.getType() == Material.AIR) {
                             if ((blockFace == BlockFace.NORTH ||
