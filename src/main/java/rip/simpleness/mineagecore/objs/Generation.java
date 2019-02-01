@@ -45,13 +45,7 @@ public final class Generation {
                             if (length >= 500) {
                                 return false;
                             } else {
-                                Schedulers.sync().run(() -> {
-                                    if (relative.getType() == Material.WATER) {
-                                        relative.setType(genBlock.getMaterial());
-                                    } else {
-                                        ((CraftBlock) relative).setTypeIdAndData(genBlock.getMaterial().getId(), (byte) 0, false);
-                                    }
-                                });
+                                Schedulers.sync().run(() -> ((CraftBlock) relative).setTypeIdAndData(genBlock.getMaterial().getId(), (byte) 0, relative.getType() == Material.WATER));
                                 currentBlockPosition = BlockPosition.of(relative);
                                 length++;
                                 return true;
