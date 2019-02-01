@@ -26,4 +26,8 @@ public final class GenerationTask implements Runnable {
     public ConcurrentHashMap<UUID, Generation> getGenerations() {
         return generations;
     }
+
+    public void setGenerations(ConcurrentHashMap<UUID, Generation> generations) {
+        this.generations = generations;
+    }
 }
