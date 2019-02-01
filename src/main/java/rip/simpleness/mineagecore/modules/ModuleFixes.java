@@ -21,7 +21,7 @@ import rip.simpleness.mineagecore.MineageCore;
 
 import javax.annotation.Nonnull;
 
-public class ModulesFixes implements TerminableModule {
+public class ModuleFixes implements TerminableModule {
 
     @Override
     public void setup(@Nonnull TerminableConsumer terminableConsumer) {
