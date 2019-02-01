@@ -37,10 +37,20 @@ public final class Generation {
                             chunk.load();
                         }
                     }).thenApplyAsync(aVoid -> {
-                        if (initialBlockPosition.toBlock().getType() != genBlock.getMaterial() || currentBlockPosition.toBlock().getType() != genBlock.getMaterial()) {
+                        if ((initialBlockPosition.toBlock().getType() != genBlock.getMaterial() || currentBlockPosition.toBlock().getType() != genBlock.getMaterial()) && (!genBlock.isPatch())) {
                             return false;
                         }
                         final Block relative = currentBlockPosition.toBlock().getRelative(blockFace);
+                        if (genBlock.isPatch() && relative.getType() == Material.AIR) {
+                            if (length >= 500) {
+                                return false;
+                            } else {
+                                Schedulers.sync().run(() -> ((CraftBlock) relative).setTypeIdAndData(genBlock.getMaterial().getId(), (byte) 0, false));
+                                currentBlockPosition = BlockPosition.of(relative);
+                                length++;
+                                return true;
+                            }
+                        }
                         if (relative.getType() == Material.AIR) {
                             if ((blockFace == BlockFace.NORTH ||
                                     blockFace == BlockFace.SOUTH ||
