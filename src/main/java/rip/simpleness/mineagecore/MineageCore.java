@@ -111,7 +111,6 @@ public final class MineageCore extends ExtendedJavaPlugin {
         bindModule(new ModuleGoldenApples());
         bindModule(new ModuleBlockCommands());
         bindModule(new ModuleVouchers());
-        bindModule(new ModuleAutoBroadcast());
         bindModule(new ModuleFactionCollector());
         bindModule(new ModuleCustomItem());
         bindModule(new ModuleGenBlock());
