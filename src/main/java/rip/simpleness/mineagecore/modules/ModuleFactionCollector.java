@@ -117,12 +117,10 @@ public class ModuleFactionCollector implements TerminableModule {
                             INSTANCE.getEconomy().depositPlayer(player, shmoney);
                             player.sendTitle(Title.builder().title(Text.colorize("&a&l+$" + shmoney)).fadeIn(5).fadeOut(5).stay(25).build());
                             factionCollector.resetWithBlacklist(CollectionType.TNT);
+                        } else if (!MPlayer.get(player).hasFaction()) {
+                            player.sendMessage(Text.colorize("&cYou need a faction to open a collector!"));
                         } else {
-                            if (!MPlayer.get(player).hasFaction()) {
-                                player.sendMessage(Text.colorize("&cYou need a faction to open a collector!"));
-                            } else {
-                                player.openInventory(factionCollector.getMenuFactionCollector().getInventory());
-                            }
+                            player.openInventory(factionCollector.getMenuFactionCollector().getInventory());
                         }
                     }
                 }).bindWith(terminableConsumer);
