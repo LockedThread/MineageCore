@@ -33,8 +33,9 @@ public class MenuIcon {
         return event;
     }
 
-    public void setEvent(Consumer<InventoryClickEvent> event) {
+    public MenuIcon setEvent(Consumer<InventoryClickEvent> event) {
         this.event = event;
+        return this;
     }
 
     @Override
