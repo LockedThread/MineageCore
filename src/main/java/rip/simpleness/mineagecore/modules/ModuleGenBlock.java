@@ -2,6 +2,7 @@ package rip.simpleness.mineagecore.modules;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.reflect.TypeToken;
+import me.lucko.helper.Commands;
 import me.lucko.helper.Events;
 import me.lucko.helper.event.filter.EventFilters;
 import me.lucko.helper.serialize.BlockPosition;
@@ -16,6 +17,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import rip.simpleness.mineagecore.MineageCore;
 import rip.simpleness.mineagecore.customitems.CustomItem;
 import rip.simpleness.mineagecore.enums.Direction;
+import rip.simpleness.mineagecore.menus.MenuGenBlock;
 import rip.simpleness.mineagecore.objs.GenBlock;
 import rip.simpleness.mineagecore.objs.Generation;
 
@@ -26,7 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ModuleGenBlock implements TerminableModule {
 
     private static final MineageCore INSTANCE = MineageCore.getInstance();
-    private static final ImmutableMap<String, GenBlock> genBlockMap = ImmutableMap.<String, GenBlock>builder()
+    public static final ImmutableMap<String, GenBlock> genBlockMap = ImmutableMap.<String, GenBlock>builder()
             .put("vertical-cobblestone", new GenBlock(Material.COBBLESTONE, Direction.DOWN, 50))
             .put("horizontal-cobblestone", new GenBlock(Material.COBBLESTONE, Direction.HORIZONTAL, 100))
             .put("vertical-obsidian", new GenBlock(Material.OBSIDIAN, Direction.DOWN, 2500))
@@ -39,6 +41,8 @@ public class ModuleGenBlock implements TerminableModule {
 
     private GsonStorageHandler<ConcurrentHashMap<UUID, Generation>> gsonStorageHandler;
 
+    private MenuGenBlock menuGenBlock;
+
     @Override
     public void setup(@Nonnull TerminableConsumer terminableConsumer) {
         this.gsonStorageHandler = new GsonStorageHandler<>("genblocks", ".json", INSTANCE.getDataFolder(), new TypeToken<ConcurrentHashMap<UUID, Generation>>() {
@@ -47,6 +51,16 @@ public class ModuleGenBlock implements TerminableModule {
         terminableConsumer.bind(() -> gsonStorageHandler.save(INSTANCE.getGenerationTask().getGenerations()));
 
         genBlockMap.forEach((key, value) -> new CustomItem(key, value.buildItemStack()));
+
+        menuGenBlock = new MenuGenBlock();
+
+        Commands.create()
+                .assertPlayer()
+                .handler(commandContext -> {
+                    commandContext.sender().openInventory(menuGenBlock.getInventory());
+                }).registerAndBind(terminableConsumer, "genblocks", "genbuckets", "genshop", "genblock", "genbucket");
+
+
         Events.subscribe(BlockPlaceEvent.class)
                 .filter(EventFilters.ignoreCancelled())
                 .filter(event -> event.getItemInHand() != null)
