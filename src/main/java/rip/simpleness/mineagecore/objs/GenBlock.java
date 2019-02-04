@@ -36,9 +36,20 @@ public final class GenBlock {
     }
 
     public ItemStack buildItemStack() {
+        String directionString = this.direction == Direction.UP || this.direction == Direction.DOWN ? "Vertical" : "Horizontal";
         return ItemStackBuilder.of(material)
-                .name("&e" + (direction == Direction.UP || direction == Direction.DOWN ? "Vertical" : "Horizontal") + " &e" + MineageCore.getInstance().capitalizeEveryWord(material.name().replace("_", " ")))
+                .name("&e" + directionString + " " + MineageCore.getInstance().capitalizeEveryWord(material.name().replace("_", " ")) + (isPatch() ? " PatchBlock" : ""))
                 .lore("", "&ePlace this genblock to start the generation process!", "")
+                .enchant(Enchantment.DURABILITY)
+                .flag(ItemFlag.HIDE_ENCHANTS)
+                .build();
+    }
+
+    public ItemStack buildGuiItemStack() {
+        String directionString = this.direction == Direction.UP || this.direction == Direction.DOWN ? "Vertical" : "Horizontal";
+        return ItemStackBuilder.of(material)
+                .name("&e" + directionString + " " + MineageCore.getInstance().capitalizeEveryWord(material.name().replace("_", " ")) + (isPatch() ? "PatchBlock" : ""))
+                .lore("", "&cPrice per place: " + price, "")
                 .enchant(Enchantment.DURABILITY)
                 .flag(ItemFlag.HIDE_ENCHANTS)
                 .build();
@@ -48,22 +59,31 @@ public final class GenBlock {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+
         GenBlock genBlock = (GenBlock) o;
-        return material == genBlock.material && direction == genBlock.direction;
+
+        return patch == genBlock.patch && Double.compare(genBlock.price, price) == 0 && material == genBlock.material && direction == genBlock.direction;
     }
 
     @Override
     public int hashCode() {
-        int result = material != null ? material.hashCode() : 0;
+        int result;
+        long temp;
+        result = (patch ? 1 : 0);
+        result = 31 * result + (material != null ? material.hashCode() : 0);
         result = 31 * result + (direction != null ? direction.hashCode() : 0);
+        temp = Double.doubleToLongBits(price);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
         return result;
     }
 
     @Override
     public String toString() {
         return "GenBlock{" +
-                "material=" + material +
+                "patch=" + patch +
+                ", material=" + material +
                 ", direction=" + direction +
+                ", price=" + price +
                 '}';
     }
 
