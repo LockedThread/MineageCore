@@ -1,6 +1,6 @@
 package rip.simpleness.mineagecore.menus;
 
-import com.massivecraft.factions.entity.MPlayer;
+import com.massivecraft.factions.FPlayers;
 import me.lucko.helper.item.ItemStackBuilder;
 import me.lucko.helper.text.Text;
 import org.bukkit.Bukkit;
@@ -75,7 +75,7 @@ public class MenuFactionCollector extends Menu {
                 int remainder = sub10OrReturn0(amount, collectionType == CollectionType.TNT ? 64 : 100), amountToBeSubtracted = collectionType == CollectionType.TNT ? 64 : 100;
                 if (remainder > 0) amountToBeSubtracted = remainder;
                 if (collectionType == CollectionType.TNT) {
-                    MPlayer.get(player).getFaction().depositTnt(amountToBeSubtracted);
+                    FPlayers.getInstance().getByPlayer(player).getFaction().depositTnt(amountToBeSubtracted);
                 } else {
                     double shmoney = (collectionType.getValue() * amountToBeSubtracted);
                     INSTANCE.getEconomy().depositPlayer(player, shmoney);
@@ -85,6 +85,11 @@ public class MenuFactionCollector extends Menu {
                 MenuFactionCollector.this.update(getFirstEmpty(), collectionType);
             }
         })));
+        while (getFirstEmpty() > -1) {
+            MenuIcon barrier = new MenuIcon(ItemStackBuilder.of(Material.BARRIER).name("&cLocked, upgrade your Faction Collector to unlock").build());
+            barrier.setEvent(event -> event.setCancelled(true));
+            setItem(getFirstEmpty(), barrier);
+        }
     }
 
     public void update(CollectionType collectionType) {
