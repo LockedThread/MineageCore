@@ -1,7 +1,7 @@
 package rip.simpleness.mineagecore.modules;
 
 import com.google.common.reflect.TypeToken;
-import com.massivecraft.factions.entity.MPlayer;
+import com.massivecraft.factions.FPlayers;
 import me.lucko.helper.Events;
 import me.lucko.helper.event.filter.EventFilters;
 import me.lucko.helper.item.ItemStackBuilder;
@@ -90,7 +90,7 @@ public class ModuleFactionCollector implements TerminableModule {
                 .handler(event -> {
                     Block block = event.getBlock();
                     String chunkToString = chunkToString(block.getChunk());
-                    FactionCollector factionCollector = factionCollectorHashMap.get(chunkToString);
+                    final FactionCollector factionCollector = factionCollectorHashMap.get(chunkToString);
                     if (factionCollector != null && me.lucko.helper.serialize.BlockPosition.of(block).equals(factionCollector.getBlockPosition())) {
                         factionCollectorHashMap.remove(chunkToString);
                         event.getPlayer().sendTitle(Title.builder().title(Text.colorize("&aSuccessfully &cremoved &aa collector")).fadeIn(5).fadeOut(5).stay(25).build());
@@ -103,7 +103,7 @@ public class ModuleFactionCollector implements TerminableModule {
                 .filter(event -> event.getAction() == Action.RIGHT_CLICK_BLOCK)
                 .filter(event -> event.getClickedBlock() != null && event.getClickedBlock().getType() == Material.BEACON)
                 .handler(event -> {
-                    FactionCollector factionCollector = factionCollectorHashMap.get(chunkToString(event.getClickedBlock().getLocation().getChunk()));
+                    final FactionCollector factionCollector = factionCollectorHashMap.get(chunkToString(event.getClickedBlock().getLocation().getChunk()));
                     if (factionCollector != null) {
                         event.setCancelled(true);
                         Player player = event.getPlayer();
@@ -117,7 +117,7 @@ public class ModuleFactionCollector implements TerminableModule {
                             INSTANCE.getEconomy().depositPlayer(player, shmoney);
                             player.sendTitle(Title.builder().title(Text.colorize("&a&l+$" + shmoney)).fadeIn(5).fadeOut(5).stay(25).build());
                             factionCollector.resetWithBlacklist(CollectionType.TNT);
-                        } else if (!MPlayer.get(player).hasFaction()) {
+                        } else if (!FPlayers.getInstance().getByPlayer(player).hasFaction()) {
                             player.sendMessage(Text.colorize("&cYou need a faction to open a collector!"));
                         } else {
                             player.openInventory(factionCollector.getMenuFactionCollector().getInventory());

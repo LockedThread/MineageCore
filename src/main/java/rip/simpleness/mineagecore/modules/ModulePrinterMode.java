@@ -1,11 +1,8 @@
 package rip.simpleness.mineagecore.modules;
 
 import com.google.common.collect.Sets;
-import com.massivecraft.factions.Rel;
-import com.massivecraft.factions.entity.BoardColl;
-import com.massivecraft.factions.entity.Faction;
-import com.massivecraft.factions.entity.MPlayer;
-import com.massivecraft.massivecore.ps.PS;
+import com.massivecraft.factions.FPlayers;
+import com.massivecraft.factions.struct.Relation;
 import io.netty.util.internal.ConcurrentSet;
 import me.lucko.helper.Commands;
 import me.lucko.helper.Events;
@@ -65,18 +62,12 @@ public class ModulePrinterMode implements TerminableModule {
                     Player player = commandContext.sender();
                     if (printingPlayers.contains(player.getUniqueId())) {
                         disablePrinter(player);
+                    } else if (!playerInventoryIsEmpty(player)) {
+                        player.sendMessage(Text.colorize(MineageCore.SERVER_PREFIX + "&eYour inventory and armor must be empty to enable printer!"));
+                    } else if (MineageCore.getInstance().canBuild(player, player.getLocation())) {
+                        player.sendMessage(Text.colorize("&cYou must be in friendly territory to activate /printer!"));
                     } else {
-                        if (!playerInventoryIsEmpty(player)) {
-                            player.sendMessage(Text.colorize(MineageCore.SERVER_PREFIX + "&eYour inventory and armor must be empty to enable printer!"));
-                        } else {
-                            MPlayer mPlayer = MPlayer.get(player);
-                            Faction faction = BoardColl.get().getFactionAt(PS.valueOf(player.getLocation()));
-                            if (!mPlayer.getRelationTo(faction).isAtLeast(Rel.RECRUIT)) {
-                                player.sendMessage(Text.colorize("&cYou must be in friendly territory to activate /printer!"));
-                            } else {
-                                enablePrinter(player);
-                            }
-                        }
+                        enablePrinter(player);
                     }
                 }).registerAndBind(terminableConsumer, "printer", "printermode");
 
@@ -122,8 +113,7 @@ public class ModulePrinterMode implements TerminableModule {
                 .filter(EventFilters.ignoreSameChunk())
                 .filter(event -> printingPlayers.contains(event.getPlayer().getUniqueId()))
                 .handler(event -> {
-                    Faction factionAt = BoardColl.get().getFactionAt(PS.valueOf(event.getTo()));
-                    if (factionAt == null || !MPlayer.get(event.getPlayer()).getRelationTo(factionAt).isAtLeast(Rel.ALLY))
+                    if (MineageCore.getInstance().canBuild(event.getPlayer(), event.getTo()))
                         disablePrinter(event.getPlayer());
                 })
                 .bindWith(terminableConsumer);
@@ -236,7 +226,7 @@ public class ModulePrinterMode implements TerminableModule {
                 Player player = Bukkit.getPlayer(printingPlayer);
                 player.getNearbyEntities(20, 20, 20)
                         .stream()
-                        .filter(entity -> entity instanceof Player && !MPlayer.get(player).getRelationTo(MPlayer.get(entity)).isAtLeast(Rel.RECRUIT))
+                        .filter(entity -> entity instanceof Player && !FPlayers.getInstance().getByPlayer((Player) entity).getRelationTo(FPlayers.getInstance().getByPlayer(player)).isAtLeast(Relation.MEMBER))
                         .forEach(entity -> {
                             player.sendMessage(Text.colorize(MineageCore.SERVER_PREFIX + "&cThere's enemies nearby!"));
                             disablePrinter(player);

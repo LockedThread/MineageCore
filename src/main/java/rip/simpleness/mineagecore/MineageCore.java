@@ -1,7 +1,8 @@
 package rip.simpleness.mineagecore;
 
-import com.massivecraft.factions.engine.EnginePermBuild;
-import com.massivecraft.massivecore.ps.PS;
+import com.massivecraft.factions.*;
+import com.massivecraft.factions.zcore.fperms.Access;
+import com.massivecraft.factions.zcore.fperms.PermissableAction;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import me.lucko.helper.Schedulers;
 import me.lucko.helper.plugin.ExtendedJavaPlugin;
@@ -33,7 +34,6 @@ import java.util.stream.Collectors;
         website = "www.simpleness.rip",
         depends = {@PluginDependency("Vault"),
                 @PluginDependency(value = "Factions"),
-                @PluginDependency(value = "MassiveCore"),
                 @PluginDependency(value = "WorldGuard"),
                 @PluginDependency("ShopGUIPlus"),
                 @PluginDependency("ProtocolLib"),
@@ -132,7 +132,10 @@ public final class MineageCore extends ExtendedJavaPlugin {
     }
 
     public boolean canBuild(Player player, Location location) {
-        return EnginePermBuild.canPlayerBuildAt(player, PS.valueOf(location), false) && worldGuardPlugin.canBuild(player, location);
+        final Faction factionAt = Board.getInstance().getFactionAt(new FLocation(player.getLocation()));
+        final FPlayer fPlayer = FPlayers.getInstance().getByPlayer(player);
+        return (factionAt.getAccess(fPlayer, PermissableAction.BUILD) == Access.ALLOW || factionAt.getAccess(fPlayer, PermissableAction.BUILD) == Access.UNDEFINED)
+                && getWorldGuardPlugin().canBuild(player, location);
     }
 
     public WorldGuardPlugin getWorldGuardPlugin() {

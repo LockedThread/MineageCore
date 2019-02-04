@@ -1,16 +1,12 @@
 scoreboard:
   display-name: '&f» &e&lMineage&6&lPVP &f«'
   lines:
-    - '&6&l__________________'
-    - '&6Balance:'
-    - '&f» &e$%vault_eco_balance_fixed%'
-    - ''
-    - '&6TPS:'
-    - '&f» &e%server_tps%'
-    - ''
-    - '&6Discord:'
-    - '&f» &ediscord.gg/eMhFHSp'
-    - '&6&l__________________'
+    - '&7&m------------------------'
+    - '&dBalance: &e$%vault_eco_balance_fixed%'
+    - '&dFaction: &e{faction_name}'
+    - '&dTPS: &e{tps}'
+    - '&dDiscord: &ediscord.gg/eMhFHSp'
+    - '&7&m-----------&7&m-------------'
 vouchers:
   protein:
     commands:
@@ -20,19 +16,6 @@ vouchers:
       material: 'NAME_TAG'
       lore:
         - '&eRight click to redeem the Protein tag'
-broadcasts:
-  0:
-    - ''
-    - '&8[&e&lMineage&6&lPVP&8] &eMake sure to donate to the server by doing /buy to support the server and receive AWESOME perks.'
-    - ''
-  1:
-    - ''
-    - '&8[&e&lMineage&6&lPVP&8] &eWe are currently accepting applications, go onto the discord and join the application server.'
-    - ''
-  2:
-    - ''
-    - '&8[&e&lMineage&6&lPVP&8] &eIf you need a faction feel free to ask in the &e&lMineage&6&lPVP &ediscord, https://discord.gg/75sCqV.'
-    - ''
 faction-collectors:
   collector-item:
     name: '&bFaction Collector'

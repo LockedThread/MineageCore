@@ -1,7 +1,7 @@
 package rip.simpleness.mineagecore.objs;
 
-import com.massivecraft.factions.entity.BoardColl;
-import com.massivecraft.massivecore.ps.PS;
+import com.massivecraft.factions.Board;
+import com.massivecraft.factions.FLocation;
 import me.lucko.helper.Schedulers;
 import me.lucko.helper.promise.Promise;
 import me.lucko.helper.serialize.BlockPosition;
@@ -55,8 +55,8 @@ public final class Generation {
                                     blockFace == BlockFace.SOUTH ||
                                     blockFace == BlockFace.EAST ||
                                     blockFace == BlockFace.WEST) &&
-                                    (!BoardColl.get().getFactionAt(PS.valueOf(initialBlockPosition.toLocation())).getName().equals(BoardColl.get().getFactionAt(PS.valueOf(currentBlockPosition.toLocation())).getName()) ||
-                                            length == 32)) {
+                                    (!Board.getInstance().getFactionAt(new FLocation(initialBlockPosition.toLocation())).getTag().equals(Board.getInstance().getFactionAt(new FLocation(currentBlockPosition.toLocation())).getTag())) ||
+                                    length == 32) {
                                 return false;
                             }
                             Schedulers.sync().run(() -> ((CraftBlock) relative).setTypeIdAndData(genBlock.getMaterial().getId(), (byte) 0, false));

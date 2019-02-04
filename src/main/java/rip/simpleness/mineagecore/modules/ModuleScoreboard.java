@@ -1,6 +1,8 @@
 package rip.simpleness.mineagecore.modules;
 
-import com.massivecraft.factions.entity.MPlayer;
+import com.google.common.collect.Lists;
+import com.massivecraft.factions.FPlayer;
+import com.massivecraft.factions.FPlayers;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.lucko.helper.Events;
 import me.lucko.helper.Schedulers;
@@ -12,6 +14,8 @@ import me.lucko.helper.terminable.TerminableConsumer;
 import me.lucko.helper.terminable.module.TerminableModule;
 import me.lucko.helper.text.Text;
 import me.lucko.helper.utils.Players;
+import me.lucko.helper.utils.Tps;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -19,6 +23,8 @@ import org.bukkit.scoreboard.DisplaySlot;
 import rip.simpleness.mineagecore.MineageCore;
 
 import javax.annotation.Nonnull;
+import java.text.DecimalFormat;
+import java.util.HashMap;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
@@ -38,11 +44,19 @@ public class ModuleScoreboard implements TerminableModule {
         this.scoreboardDisplayName = Text.colorize(INSTANCE.getConfig().getString("scoreboard.display-name"));
 
         BiConsumer<Player, ScoreboardObjective> updater = (player, scoreboardObjective) -> {
-            final MPlayer mPlayer = MPlayer.get(player);
+            FPlayer fPlayer = FPlayers.getInstance().getByPlayer(player);
             scoreboardObjective.setDisplayName(scoreboardDisplayName);
-            scoreboardObjective.applyLines(PlaceholderAPI.setPlaceholders(player, scoreboardLines.stream()
-                    .map(s -> s.replace("{factions_name}", mPlayer.getFaction().isNone() ? "&2Wilderness" : mPlayer.getFaction().getName()))
-                    .collect(Collectors.toList())));
+            HashMap<String, Integer> map = new HashMap<>();
+            final List<String> reversed = Lists.reverse(scoreboardLines);
+            for (int i = 0; i < reversed.size(); i++) {
+                String line = reversed.get(i);
+                if (line.isEmpty()) {
+                    map.put(StringUtils.repeat(" ", i), i);
+                } else {
+                    map.put(PlaceholderAPI.setPlaceholders(player, line.replace("{faction_name}", fPlayer.hasFaction() ? fPlayer.getFaction().getTag() : "&2Wilderness").replace("{tps}", new DecimalFormat("#.##").format(Tps.read().avg1()))), i);
+                }
+            }
+            scoreboardObjective.applyScores(map);
         };
 
         Events.subscribe(PlayerJoinEvent.class)
