@@ -36,7 +36,6 @@ public class ModuleGenBlock implements TerminableModule {
             .put("vertical-sand", new GenBlock(Material.SAND, Direction.UP, 2500))
             .put("vertical-cobblestone-patch", new GenBlock(Material.COBBLESTONE, Direction.DOWN, 1000, true))
             .put("vertical-obsidian-patch", new GenBlock(Material.OBSIDIAN, Direction.DOWN, 2500, true))
-            .put("vertical-sand-cannon", new GenBlock(Material.SAND, Direction.UP, 5000, true))
             .build();
 
     private GsonStorageHandler<ConcurrentHashMap<UUID, Generation>> gsonStorageHandler;
@@ -56,9 +55,8 @@ public class ModuleGenBlock implements TerminableModule {
 
         Commands.create()
                 .assertPlayer()
-                .handler(commandContext -> {
-                    commandContext.sender().openInventory(menuGenBlock.getInventory());
-                }).registerAndBind(terminableConsumer, "genblocks", "genbuckets", "genshop", "genblock", "genbucket");
+                .handler(commandContext -> commandContext.sender().openInventory(menuGenBlock.getInventory()))
+                .registerAndBind(terminableConsumer, "genblocks", "genbuckets", "genshop", "genblock", "genbucket");
 
 
         Events.subscribe(BlockPlaceEvent.class)
@@ -80,13 +78,8 @@ public class ModuleGenBlock implements TerminableModule {
                                 BlockFace blockFace = genBlock.getDirection().toBlockFace();
                                 if (blockFace == null) {
                                     blockFace = genBlock.getDirection().toBlockFace(event.getBlockAgainst(), event.getBlockPlaced());
-                                    INSTANCE
-                                            .getGenerationTask()
-                                            .getGenerations()
-                                            .put(UUID.randomUUID(), new Generation(genBlock, BlockPosition.of(event.getBlockPlaced()), blockFace));
                                 }
-                                INSTANCE
-                                        .getGenerationTask()
+                                INSTANCE.getGenerationTask()
                                         .getGenerations()
                                         .put(UUID.randomUUID(), new Generation(genBlock, BlockPosition.of(event.getBlockPlaced()), blockFace));
                             }
