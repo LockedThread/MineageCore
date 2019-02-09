@@ -13,7 +13,7 @@ import javax.annotation.Nonnull;
 
 public class ModuleBlockCommands implements TerminableModule {
 
-    private ImmutableSet<String> blockedCommands = ImmutableSet.<String>builder().add("/plugins", "/pl", "/?", "/icanhasbukkit", "/version").build();
+    private ImmutableSet<String> blockedCommands = ImmutableSet.<String>builder().add("/plugins", "/pl", "/?", "/icanhasbukkit", "/version", ":", "minecraft", "bukkit").build();
 
     @Override
     public void setup(@Nonnull TerminableConsumer terminableConsumer) {
@@ -22,7 +22,7 @@ public class ModuleBlockCommands implements TerminableModule {
                 .filter(event -> !event.getPlayer().hasPermission("mineagepvp.admin"))
                 .handler(event -> {
                     String root = event.getMessage().split(" ")[0];
-                    if (blockedCommands.contains(root) || root.contains(":") || root.contains("/minecraft") || root.contains("/bukkit") || root.contains("version") || root.contains("tps") || root.contains("fps")) {
+                    if (blockedCommands.contains(root)) {
                         event.setCancelled(true);
                         event.getPlayer().sendMessage(Text.colorize(MineageCore.SERVER_PREFIX + "&cNo no no...."));
                     }
