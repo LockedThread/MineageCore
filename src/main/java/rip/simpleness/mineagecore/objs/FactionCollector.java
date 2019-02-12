@@ -49,12 +49,12 @@ public final class FactionCollector {
     }
 
     public void removeAmount(CollectionType collectionType, int amount) {
-        getAmounts().computeIfPresent(collectionType, (collectionType1, integer) -> integer -= amount);
+        getAmounts().computeIfPresent(collectionType, (collectionType1, integer) -> integer = integer - amount);
         getMenuFactionCollector().update(collectionType);
     }
 
     public void addAmount(CollectionType collectionType, int amount) {
-        getAmounts().computeIfPresent(collectionType, (collectionType1, integer) -> integer += amount);
+        getAmounts().computeIfPresent(collectionType, (collectionType1, integer) -> integer = amount + integer);
         getAmounts().putIfAbsent(collectionType, 1);
         getMenuFactionCollector().update(collectionType);
     }

@@ -1,6 +1,7 @@
 package rip.simpleness.mineagecore.menus;
 
 import com.massivecraft.factions.FPlayers;
+import com.massivecraft.factions.Faction;
 import me.lucko.helper.item.ItemStackBuilder;
 import me.lucko.helper.text.Text;
 import org.bukkit.Bukkit;
@@ -75,14 +76,18 @@ public class MenuFactionCollector extends Menu {
                 int remainder = sub10OrReturn0(amount, collectionType == CollectionType.TNT ? 64 : 100), amountToBeSubtracted = collectionType == CollectionType.TNT ? 64 : 100;
                 if (remainder > 0) amountToBeSubtracted = remainder;
                 if (collectionType == CollectionType.TNT) {
-                    FPlayers.getInstance().getByPlayer(player).getFaction().depositTnt(amountToBeSubtracted);
+                    Faction faction = FPlayers.getInstance().getByPlayer(player).getFaction();
+                    faction.setTntBankBalance(faction.getTntBankBalance() + amountToBeSubtracted);
                 } else {
                     double shmoney = (collectionType.getValue() * amountToBeSubtracted);
                     INSTANCE.getEconomy().depositPlayer(player, shmoney);
                     player.sendTitle(Title.builder().title(Text.colorize("&a&l+$" + shmoney)).fadeIn(5).fadeOut(5).stay(25).build());
                 }
                 factionCollector.removeAmount(collectionType, amountToBeSubtracted);
-                MenuFactionCollector.this.update(getFirstEmpty(), collectionType);
+                final int firstEmpty = getFirstEmpty();
+                if (firstEmpty > -1) {
+                    update(firstEmpty, collectionType);
+                }
             }
         })));
         while (getFirstEmpty() > -1) {
@@ -111,9 +116,17 @@ public class MenuFactionCollector extends Menu {
     }
 
     public void update(int slot, CollectionType collectionType) {
-        final ItemStack itemStack = collectionType.buildItemStack(factionCollector.getAmounts().getOrDefault(collectionType, 0));
+        ItemStack itemStack = collectionType.buildItemStack(factionCollector.getAmounts().getOrDefault(collectionType, 0));
         getMenuIcon(slot).ifPresent(menuIcon -> menuIcon.setItemStack(itemStack));
-        getViewers().forEach(viewer -> Bukkit.getPlayer(viewer).updateInventory());
+        for (UUID viewer : getViewers()) {
+            Bukkit.getPlayer(viewer)
+                    .getOpenInventory()
+                    .getTopInventory()
+                    .setItem(
+                            slot,
+                            itemStack
+                    );
+        }
     }
 
     public HashSet<UUID> getViewers() {

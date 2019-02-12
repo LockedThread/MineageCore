@@ -29,6 +29,7 @@ public class MenuListener implements Listener {
             Consumer<InventoryOpenEvent> consumer = ((Menu) event.getInventory().getHolder()).getInventoryOpenEventConsumer();
             if (consumer != null) {
                 consumer.accept(event);
+                System.out.println("opened menu and called consumer");
             }
         }
     }
