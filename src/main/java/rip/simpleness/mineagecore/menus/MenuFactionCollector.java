@@ -1,27 +1,11 @@
 package rip.simpleness.mineagecore.menus;
 
-import com.massivecraft.factions.FPlayers;
-import com.massivecraft.factions.Faction;
-import me.lucko.helper.item.ItemStackBuilder;
-import me.lucko.helper.text.Text;
-import org.bukkit.Bukkit;
-import org.bukkit.DyeColor;
-import org.bukkit.Material;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.SpawnEgg;
-import org.github.paperspigot.Title;
-import rip.simpleness.mineagecore.MineageCore;
-import rip.simpleness.mineagecore.enums.CollectionType;
-import rip.simpleness.mineagecore.enums.FactionCollectorUpgrade;
-import rip.simpleness.mineagecore.modules.ModuleFactionCollector;
-import rip.simpleness.mineagecore.objs.FactionCollector;
 
-import java.util.HashSet;
-import java.util.UUID;
-import java.util.stream.IntStream;
+/*
+ * Old Menu class
+ */
 
+/*
 public class MenuFactionCollector extends Menu {
 
     private static final MineageCore INSTANCE = MineageCore.getInstance();
@@ -137,3 +121,4 @@ public class MenuFactionCollector extends Menu {
         return i < 0 ? -1 : i % divisor > 0 && i < divisor ? i % divisor : 0;
     }
 }
+*/
