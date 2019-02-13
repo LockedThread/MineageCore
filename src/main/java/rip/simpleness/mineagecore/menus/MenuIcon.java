@@ -25,8 +25,9 @@ public class MenuIcon {
         return itemStack;
     }
 
-    public void setItemStack(ItemStack itemStack) {
+    public MenuIcon setItemStack(ItemStack itemStack) {
         this.itemStack = itemStack;
+        return this;
     }
 
     public Consumer<InventoryClickEvent> getEvent() {
