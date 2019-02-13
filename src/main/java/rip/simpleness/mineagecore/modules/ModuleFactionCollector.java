@@ -30,6 +30,7 @@ import rip.simpleness.mineagecore.MineageCore;
 import rip.simpleness.mineagecore.customitems.CustomItem;
 import rip.simpleness.mineagecore.enums.CollectionType;
 import rip.simpleness.mineagecore.enums.FactionCollectorUpgrade;
+import rip.simpleness.mineagecore.menus.InventoryCollector;
 import rip.simpleness.mineagecore.objs.FactionCollector;
 
 import javax.annotation.Nonnull;
@@ -62,6 +63,21 @@ public class ModuleFactionCollector implements TerminableModule {
         this.factionCollectorHashMap = gsonStorageHandler.load().orElse(new HashMap<>());
 
         terminableConsumer.bind(() -> gsonStorageHandler.save(factionCollectorHashMap));
+
+        InventoryCollector.LOCATIONS.putAll(new HashMap<Integer, CollectionType>() {{
+            put(21, CollectionType.CACTUS);
+            put(23, CollectionType.SUGAR_CANE);
+            put(9, CollectionType.IRON_GOLEM);
+            put(10, CollectionType.PIG_ZOMBIE);
+            put(11, CollectionType.VILLAGER);
+            put(12, CollectionType.ENDERMAN);
+            put(13, CollectionType.TNT);
+            put(14, CollectionType.PIG);
+            put(15, CollectionType.COW);
+            put(16, CollectionType.CHICKEN);
+            put(17, CollectionType.WITCH);
+
+        }});
 
         setupItemStacks();
 

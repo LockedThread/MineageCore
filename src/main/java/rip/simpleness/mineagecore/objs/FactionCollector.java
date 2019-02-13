@@ -2,11 +2,10 @@ package rip.simpleness.mineagecore.objs;
 
 import com.google.gson.annotations.SerializedName;
 import me.lucko.helper.serialize.BlockPosition;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import rip.simpleness.mineagecore.enums.CollectionType;
 import rip.simpleness.mineagecore.enums.FactionCollectorUpgrade;
-import rip.simpleness.mineagecore.menus.MenuFactionCollector;
+import rip.simpleness.mineagecore.menus.InventoryCollector;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +19,7 @@ public final class FactionCollector {
 
     private HashMap<CollectionType, Integer> amounts;
 
-    private transient MenuFactionCollector menuFactionCollector;
+    private transient InventoryCollector inventoryCollector;
 
     public FactionCollector(Location location) {
         this(BlockPosition.of(location), FactionCollectorUpgrade.DEFAULT, new HashMap<>());
@@ -50,13 +49,11 @@ public final class FactionCollector {
 
     public void removeAmount(CollectionType collectionType, int amount) {
         getAmounts().computeIfPresent(collectionType, (collectionType1, integer) -> integer = integer - amount);
-        getMenuFactionCollector().update(collectionType);
     }
 
     public void addAmount(CollectionType collectionType, int amount) {
         getAmounts().computeIfPresent(collectionType, (collectionType1, integer) -> integer = amount + integer);
         getAmounts().putIfAbsent(collectionType, 1);
-        getMenuFactionCollector().update(collectionType);
     }
 
     public void reset(CollectionType collectionType) {
@@ -78,7 +75,6 @@ public final class FactionCollector {
     public void upgrade() {
         this.factionCollectorUpgrade = factionCollectorUpgrade.getNext();
         getMenuFactionCollector().setup();
-        getMenuFactionCollector().getViewers().forEach(viewer -> Bukkit.getPlayer(viewer).updateInventory());
     }
 
     @Override
@@ -89,10 +85,10 @@ public final class FactionCollector {
                 '}';
     }
 
-    public MenuFactionCollector getMenuFactionCollector() {
-        if (menuFactionCollector == null) {
-            this.menuFactionCollector = new MenuFactionCollector(this);
+    public InventoryCollector getMenuFactionCollector() {
+        if (inventoryCollector == null) {
+            this.inventoryCollector = new InventoryCollector(this);
         }
-        return this.menuFactionCollector;
+        return this.inventoryCollector;
     }
 }
