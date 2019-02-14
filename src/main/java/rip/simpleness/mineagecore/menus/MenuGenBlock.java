@@ -9,14 +9,11 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import rip.simpleness.mineagecore.customitems.CustomItem;
 import rip.simpleness.mineagecore.modules.ModuleGenBlock;
-import rip.simpleness.mineagecore.objs.GenBlock;
-
-import java.util.Map;
 
 public class MenuGenBlock extends Menu {
 
     public MenuGenBlock() {
-        super("&cGenBlock Shop", 9);
+        super(9, "&cGenBlock Shop");
         setup();
     }
 
@@ -28,18 +25,16 @@ public class MenuGenBlock extends Menu {
                 .enchant(Enchantment.DURABILITY)
                 .name(" ")
                 .build();
-        setItem(0, pane);
-        setItem(8, pane);
-        for (Map.Entry<String, GenBlock> entry : ModuleGenBlock.genBlockMap.entrySet()) {
-            setItem(getFirstEmpty(), new MenuIcon(entry.getValue().buildGuiItemStack()).setEvent(event -> {
-                if (event.getWhoClicked().getInventory().firstEmpty() == -1) {
-                    event.getWhoClicked().sendMessage(Text.colorize("&cYour inventory is full!"));
-                    event.getWhoClicked().closeInventory();
-                } else {
-                    event.getWhoClicked().getInventory().addItem(CustomItem.getCustomItemHashMap().get(entry.getKey()).getItemStack());
-                }
-                event.setCancelled(true);
-            }));
-        }
+        setIcon(0, pane);
+        setIcon(8, pane);
+        ModuleGenBlock.genBlockMap.forEach((key, value) -> setIcon(getFirstEmpty(), new MenuIcon(value.buildGuiItemStack()).setEvent(event -> {
+            if (event.getWhoClicked().getInventory().firstEmpty() == -1) {
+                event.getWhoClicked().sendMessage(Text.colorize("&cYour inventory is full!"));
+                event.getWhoClicked().closeInventory();
+            } else {
+                event.getWhoClicked().getInventory().addItem(CustomItem.getCustomItemHashMap().get(key).getItemStack());
+            }
+            event.setCancelled(true);
+        })));
     }
 }
