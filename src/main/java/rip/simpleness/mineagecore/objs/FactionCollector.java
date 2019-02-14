@@ -5,7 +5,7 @@ import me.lucko.helper.serialize.BlockPosition;
 import org.bukkit.Location;
 import rip.simpleness.mineagecore.enums.CollectionType;
 import rip.simpleness.mineagecore.enums.FactionCollectorUpgrade;
-import rip.simpleness.mineagecore.menus.InventoryCollector;
+import rip.simpleness.mineagecore.menus.MenuCollector;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,7 +19,7 @@ public final class FactionCollector {
 
     private HashMap<CollectionType, Integer> amounts;
 
-    private transient InventoryCollector inventoryCollector;
+    private transient MenuCollector menuCollector;
 
     public FactionCollector(Location location) {
         this(BlockPosition.of(location), FactionCollectorUpgrade.DEFAULT, new HashMap<>());
@@ -48,12 +48,14 @@ public final class FactionCollector {
     }
 
     public void removeAmount(CollectionType collectionType, int amount) {
-        getAmounts().computeIfPresent(collectionType, (collectionType1, integer) -> integer = integer - amount);
+        getAmounts().computeIfPresent(collectionType, (collectionType1, integer) -> integer -= amount);
+        getMenuFactionCollector().update(MenuCollector.LOCATIONS.getInt(collectionType), collectionType, getAmounts().get(collectionType));
     }
 
     public void addAmount(CollectionType collectionType, int amount) {
-        getAmounts().computeIfPresent(collectionType, (collectionType1, integer) -> integer = amount + integer);
+        getAmounts().computeIfPresent(collectionType, (collectionType1, integer) -> integer += amount);
         getAmounts().putIfAbsent(collectionType, 1);
+        getMenuFactionCollector().update(MenuCollector.LOCATIONS.getInt(collectionType), collectionType, getAmounts().getOrDefault(collectionType, 1));
     }
 
     public void reset(CollectionType collectionType) {
@@ -85,10 +87,10 @@ public final class FactionCollector {
                 '}';
     }
 
-    public InventoryCollector getMenuFactionCollector() {
-        if (inventoryCollector == null) {
-            this.inventoryCollector = new InventoryCollector(this);
+    public MenuCollector getMenuFactionCollector() {
+        if (menuCollector == null) {
+            this.menuCollector = new MenuCollector(this);
         }
-        return this.inventoryCollector;
+        return this.menuCollector;
     }
 }

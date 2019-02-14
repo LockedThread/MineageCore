@@ -2,13 +2,13 @@ package rip.simpleness.mineagecore.menus;
 
 import com.massivecraft.factions.FPlayers;
 import com.massivecraft.factions.Faction;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import me.lucko.helper.item.ItemStackBuilder;
 import me.lucko.helper.text.Text;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.github.paperspigot.Title;
 import rip.simpleness.mineagecore.MineageCore;
@@ -17,18 +17,20 @@ import rip.simpleness.mineagecore.enums.FactionCollectorUpgrade;
 import rip.simpleness.mineagecore.modules.ModuleFactionCollector;
 import rip.simpleness.mineagecore.objs.FactionCollector;
 
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class InventoryCollector extends CustomInventory {
+public class MenuCollector extends Menu {
 
-    public static final transient Int2ObjectMap<CollectionType> LOCATIONS = Int2ObjectMaps.emptyMap();
+    public static final transient Object2IntOpenHashMap<CollectionType> LOCATIONS = new Object2IntOpenHashMap<>();
     private static final MineageCore INSTANCE = MineageCore.getInstance();
     private FactionCollector factionCollector;
 
-    public InventoryCollector(FactionCollector factionCollector) {
+    public MenuCollector(FactionCollector factionCollector) {
         super(27, "      &eFaction Collector");
         this.factionCollector = factionCollector;
+        setup();
     }
 
     @Override
@@ -59,12 +61,12 @@ public class InventoryCollector extends CustomInventory {
                         .name(" ")
                         .build()));
 
-        LOCATIONS.int2ObjectEntrySet().forEach(entry -> {
-            CollectionType collectionType = entry.getValue();
-            int slot = entry.getIntKey();
+        LOCATIONS.object2IntEntrySet().forEach(entry -> {
+            CollectionType collectionType = entry.getKey();
+            int slot = entry.getIntValue();
             if (factionCollector.getFactionCollectorUpgrade().getApplicables().contains(collectionType)) {
-                int amount = factionCollector.getAmounts().getOrDefault(collectionType, 0);
-                setIcon(getFirstEmpty(), new MenuIcon(collectionType.buildItemStack(amount), event -> {
+                setIcon(slot, new MenuIcon(collectionType.buildItemStack(factionCollector.getAmounts().getOrDefault(collectionType, 0)), event -> {
+                    int amount = factionCollector.getAmounts().getOrDefault(collectionType, 0);
                     event.setCancelled(true);
                     if (amount >= 0) {
                         int remainder = sub10OrReturn0(amount, collectionType == CollectionType.TNT ? 64 : 100), amountToBeSubtracted = collectionType == CollectionType.TNT ? 64 : 100;
@@ -79,26 +81,56 @@ public class InventoryCollector extends CustomInventory {
                             player.sendTitle(Title.builder().title(Text.colorize("&a&l+$" + shmoney)).fadeIn(5).fadeOut(5).stay(25).build());
                         }
                         factionCollector.removeAmount(collectionType, amountToBeSubtracted);
-                        if (slot > -1) {
-                            update(slot, collectionType);
-                        }
+                        update(slot, collectionType, amount - amountToBeSubtracted);
                     }
                 }));
             } else {
-                setIcon(getFirstEmpty(), new MenuIcon(ItemStackBuilder.of(Material.BARRIER).name("&cLocked, upgrade your Faction Collector to unlock").build()).setEvent(event -> event.setCancelled(true)));
+                setIcon(slot, new MenuIcon(ItemStackBuilder.of(Material.BARRIER).name("&cLocked, upgrade your Faction Collector to unlock").build()).setEvent(event -> event.setCancelled(true)));
             }
         });
     }
 
-    private void update(int slot, CollectionType collectionType) {
-        updateIcon(slot, itemStack -> {
-            ItemMeta meta = itemStack.getItemMeta();
-            meta.setLore(INSTANCE.getConfig().getStringList("faction-collectors.gui.items.collection-type-format.lore")
+    /*public void update(CollectionType collectionType) {
+        if (!getInventory().getViewers().isEmpty()) {
+            final EntityType entityType = collectionType.parseEntityType();
+            getInventory().getViewers()
                     .stream()
-                    .map(s -> s.replace("{amount}", String.valueOf(factionCollector.getAmounts().getOrDefault(collectionType, 0))))
-                    .collect(Collectors.toList()));
-            itemStack.setItemMeta(meta);
-        });
+                    .filter(humanEntity -> humanEntity instanceof Player)
+                    .map(humanEntity -> (Player) humanEntity)
+                    .forEach(player -> {
+                        Inventory inventory = player.getOpenInventory().getTopInventory();
+                        ItemStack[] itemStacks = inventory.getContents().clone();
+                        int bound = itemStacks.length;
+                        for (int i = 0; i < bound; i++) {
+                            if (itemStacks[i] != null) {
+                                ItemStack itemStack = itemStacks[i];
+                                if (entityType != null && (itemStack.getType() == Material.MONSTER_EGG &&
+                                        EntityType.fromId(INSTANCE.getVenom().getSilkUtil().getStoredEggEntityID(itemStack)) == collectionType.parseEntityType()) ||
+                                        itemStack.getType() == collectionType.parseMaterial()) {
+                                    ItemMeta itemMeta = itemStack.getItemMeta();
+                                    itemMeta.setLore(INSTANCE.getConfig().getStringList("gui.item-template.lore").stream().map(s -> ChatColor.translateAlternateColorCodes('&', s.replace("{amount}", String.valueOf(getAmount(collectionType))))).collect(Collectors.toList()));
+                                    itemStack.setItemMeta(itemMeta);
+                                    itemStacks[i] = itemStack;
+                                }
+                            }
+                        }
+                        inventory.setContents(itemStacks);
+                        player.updateInventory();
+                    });
+        }
+    }*/
+
+    public void update(int slot, CollectionType collectionType, int replace) {
+        List<String> stringList = collectionType.getItemStack().getItemMeta().getLore().stream().map(s -> Text.colorize(s.replace("{amount}", String.valueOf(replace)))).collect(Collectors.toList());
+
+        ItemStack item = getItem(slot).clone();
+        ItemMeta itemMeta = item.getItemMeta();
+        itemMeta.setLore(stringList);
+        item.setItemMeta(itemMeta);
+
+        getInventory().setItem(slot, item);
+        setIcon(slot, getIcon(slot).setItemStack(item));
+        getInventory().getViewers().forEach(viewer -> ((Player) viewer).updateInventory());
     }
 
     private int sub10OrReturn0(int i, int divisor) {
