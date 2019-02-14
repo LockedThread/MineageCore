@@ -12,7 +12,7 @@ public enum FactionCollectorUpgrade {
 
     DEFAULT(1, CollectionType.CACTUS, CollectionType.SUGAR_CANE),
     _1(2, CollectionType.COW, CollectionType.PIG, CollectionType.CHICKEN),
-    _2(3, CollectionType.PIG_ZOMBIE, CollectionType.ENDERMAN, CollectionType.CREEPER),
+    _2(3, CollectionType.PIG_ZOMBIE, CollectionType.ENDERMAN, CollectionType.CREEPER, CollectionType.TNT),
     _3(4, CollectionType.IRON_GOLEM, CollectionType.VILLAGER, CollectionType.WITCH);
 
     private double price;
