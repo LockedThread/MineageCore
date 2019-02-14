@@ -96,6 +96,10 @@ public enum CollectionType {
         return name();
     }
 
+    public ItemStack getItemStack() {
+        return itemStack;
+    }
+
     public void init() {
         final ConfigurationSection section = MineageCore.getInstance().getConfig().getConfigurationSection("faction-collectors.gui.items");
         itemStack = parseMaterial() != null ? ItemStackBuilder.of(parseMaterial())
