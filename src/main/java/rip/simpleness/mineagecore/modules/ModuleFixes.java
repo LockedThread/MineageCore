@@ -1,7 +1,9 @@
 package rip.simpleness.mineagecore.modules;
 
+import com.google.common.collect.ImmutableSet;
 import me.lucko.helper.Events;
 import me.lucko.helper.Schedulers;
+import me.lucko.helper.event.filter.EventFilters;
 import me.lucko.helper.terminable.TerminableConsumer;
 import me.lucko.helper.terminable.module.TerminableModule;
 import me.lucko.helper.text.Text;
@@ -11,7 +13,9 @@ import org.bukkit.entity.Item;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -22,6 +26,20 @@ import rip.simpleness.mineagecore.MineageCore;
 import javax.annotation.Nonnull;
 
 public class ModuleFixes implements TerminableModule {
+
+
+    private static final ImmutableSet<Material> BLOCKED_CRAFTING = new ImmutableSet.Builder<Material>().add(Material.HOPPER,
+            Material.MINECART,
+            Material.COMMAND_MINECART,
+            Material.EXPLOSIVE_MINECART,
+            Material.HOPPER_MINECART, Material.POWERED_MINECART,
+            Material.STORAGE_MINECART,
+            Material.BEACON,
+            Material.GOLDEN_APPLE,
+            Material.RAILS,
+            Material.ACTIVATOR_RAIL,
+            Material.DETECTOR_RAIL,
+            Material.POWERED_RAIL).build();
 
     @Override
     public void setup(@Nonnull TerminableConsumer terminableConsumer) {
@@ -64,5 +82,14 @@ public class ModuleFixes implements TerminableModule {
 
         Events.subscribe(PlayerDeathEvent.class).handler(event -> Schedulers.sync().runLater(() -> event.getEntity().spigot().respawn(), 1)).bindWith(terminableConsumer);
 
+        Events.subscribe(EntitySpawnEvent.class)
+                .filter(EventFilters.ignoreCancelled())
+                .filter(event -> event.getEntityType() == EntityType.HORSE || event.getEntityType().name().contains(EntityType.MINECART.name()))
+                .handler(event -> event.setCancelled(true));
+
+        Events.subscribe(CraftItemEvent.class)
+                .filter(EventFilters.ignoreCancelled())
+                .filter(event -> BLOCKED_CRAFTING.contains(event.getRecipe().getResult().getType()))
+                .handler(event -> event.setCancelled(true));
     }
 }
