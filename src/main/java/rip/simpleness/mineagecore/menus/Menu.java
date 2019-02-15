@@ -13,7 +13,7 @@ public abstract class Menu implements InventoryHolder {
     private Int2ObjectOpenHashMap<MenuIcon> menuIcons;
 
     public Menu(int size, String name) {
-        this.inventory = Bukkit.createInventory(null, size, Text.colorize(name));
+        this.inventory = Bukkit.createInventory(this, size, Text.colorize(name));
         this.menuIcons = new Int2ObjectOpenHashMap<>();
     }
 
