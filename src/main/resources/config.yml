@@ -2,7 +2,7 @@ scoreboard:
   display-name: '&f» &e&lMineage&6&lPVP &f«'
   lines:
     - '&7&m------------------------'
-    - '&dBalance: &e$%vault_eco_balance_fixed%'
+    - '&dBalance: &e${balance}'
     - '&dFaction: &e{faction_name}'
     - '&dTPS: &e{tps}'
     - '&dDiscord: &ediscord.gg/eMhFHSp'
