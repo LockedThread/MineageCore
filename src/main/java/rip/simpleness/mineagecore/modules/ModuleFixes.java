@@ -27,7 +27,6 @@ import javax.annotation.Nonnull;
 
 public class ModuleFixes implements TerminableModule {
 
-
     private static final ImmutableSet<Material> BLOCKED_CRAFTING = new ImmutableSet.Builder<Material>().add(Material.HOPPER,
             Material.MINECART,
             Material.COMMAND_MINECART,
