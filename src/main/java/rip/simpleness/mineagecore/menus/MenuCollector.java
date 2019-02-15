@@ -68,7 +68,7 @@ public class MenuCollector extends Menu {
                 setIcon(slot, new MenuIcon(collectionType.buildItemStack(factionCollector.getAmounts().getOrDefault(collectionType, 0)), event -> {
                     int amount = factionCollector.getAmounts().getOrDefault(collectionType, 0);
                     event.setCancelled(true);
-                    if (amount >= 0) {
+                    if (amount > 0) {
                         int remainder = sub10OrReturn0(amount, collectionType == CollectionType.TNT ? 64 : 100), amountToBeSubtracted = collectionType == CollectionType.TNT ? 64 : 100;
                         if (remainder > 0) amountToBeSubtracted = remainder;
                         Player player = (Player) event.getWhoClicked();
@@ -80,8 +80,8 @@ public class MenuCollector extends Menu {
                             INSTANCE.getEconomy().depositPlayer(player, shmoney);
                             player.sendTitle(Title.builder().title(Text.colorize("&a&l+$" + shmoney)).fadeIn(5).fadeOut(5).stay(25).build());
                         }
-                        factionCollector.removeAmount(collectionType, amountToBeSubtracted);
                         update(slot, collectionType, amount - amountToBeSubtracted);
+                        factionCollector.removeAmount(collectionType, amountToBeSubtracted);
                     }
                 }));
             } else {
@@ -89,36 +89,6 @@ public class MenuCollector extends Menu {
             }
         });
     }
-
-    /*public void update(CollectionType collectionType) {
-        if (!getInventory().getViewers().isEmpty()) {
-            final EntityType entityType = collectionType.parseEntityType();
-            getInventory().getViewers()
-                    .stream()
-                    .filter(humanEntity -> humanEntity instanceof Player)
-                    .map(humanEntity -> (Player) humanEntity)
-                    .forEach(player -> {
-                        Inventory inventory = player.getOpenInventory().getTopInventory();
-                        ItemStack[] itemStacks = inventory.getContents().clone();
-                        int bound = itemStacks.length;
-                        for (int i = 0; i < bound; i++) {
-                            if (itemStacks[i] != null) {
-                                ItemStack itemStack = itemStacks[i];
-                                if (entityType != null && (itemStack.getType() == Material.MONSTER_EGG &&
-                                        EntityType.fromId(INSTANCE.getVenom().getSilkUtil().getStoredEggEntityID(itemStack)) == collectionType.parseEntityType()) ||
-                                        itemStack.getType() == collectionType.parseMaterial()) {
-                                    ItemMeta itemMeta = itemStack.getItemMeta();
-                                    itemMeta.setLore(INSTANCE.getConfig().getStringList("gui.item-template.lore").stream().map(s -> ChatColor.translateAlternateColorCodes('&', s.replace("{amount}", String.valueOf(getAmount(collectionType))))).collect(Collectors.toList()));
-                                    itemStack.setItemMeta(itemMeta);
-                                    itemStacks[i] = itemStack;
-                                }
-                            }
-                        }
-                        inventory.setContents(itemStacks);
-                        player.updateInventory();
-                    });
-        }
-    }*/
 
     public void update(int slot, CollectionType collectionType, int replace) {
         List<String> stringList = collectionType.getItemStack().getItemMeta().getLore().stream().map(s -> Text.colorize(s.replace("{amount}", String.valueOf(replace)))).collect(Collectors.toList());
