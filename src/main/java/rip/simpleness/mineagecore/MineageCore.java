@@ -105,7 +105,6 @@ public final class MineageCore extends ExtendedJavaPlugin {
 
         this.packetScoreboardProvider = provideService(PacketScoreboardProvider.class, new PacketScoreboardProvider(this));
 
-        bindModule(new ModuleSilkSpawner());
         bindModule(new ModuleJellyLegs());
         bindModule(new ModuleNightVision());
         bindModule(new ModuleGoldenApples());
