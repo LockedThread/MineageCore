@@ -3,7 +3,6 @@ package rip.simpleness.mineagecore.modules;
 import com.google.common.collect.Lists;
 import com.massivecraft.factions.FPlayer;
 import com.massivecraft.factions.FPlayers;
-import me.clip.placeholderapi.PlaceholderAPI;
 import me.lucko.helper.Events;
 import me.lucko.helper.Schedulers;
 import me.lucko.helper.metadata.Metadata;
@@ -17,6 +16,7 @@ import me.lucko.helper.utils.Players;
 import me.lucko.helper.utils.Tps;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scoreboard.DisplaySlot;
@@ -53,11 +53,14 @@ public class ModuleScoreboard implements TerminableModule {
                 if (line.isEmpty()) {
                     map.put(StringUtils.repeat(" ", i), i);
                 } else {
-                    map.put(PlaceholderAPI.setPlaceholders(player, line.replace("{faction_name}", fPlayer.hasFaction() ? fPlayer.getFaction().getTag() : "&2Wilderness").replace("{tps}", new DecimalFormat("#.##").format(Tps.read().avg1()))), i);
+                    map.put(line.replace("{faction_name}", fPlayer.hasFaction() ? fPlayer.getFaction().getTag() : "&2Wilderness").replace("{balance}", String.valueOf(INSTANCE.getEconomy().getBalance(player))).replace("{tps}", new DecimalFormat("#.##").format(Tps.read().avg1())), i);
                 }
             }
             scoreboardObjective.applyScores(map);
         };
+
+        Events.subscribe(PlayerChangedWorldEvent.class)
+                .handler(event -> updater.accept(event.getPlayer(), Metadata.provideForPlayer(event.getPlayer()).getOrNull(SCOREBOARD_OBJECTIVE_METADATA_KEY))).bindWith(terminableConsumer);
 
         Events.subscribe(PlayerJoinEvent.class)
                 .handler(event -> {
@@ -72,6 +75,6 @@ public class ModuleScoreboard implements TerminableModule {
 
         Schedulers.async().runRepeating(() -> Players.all().forEach(player -> {
             updater.accept(player, Metadata.provideForPlayer(player).getOrNull(SCOREBOARD_OBJECTIVE_METADATA_KEY));
-        }), 200L, 200L);
+        }), 100L, 100L);
     }
 }
