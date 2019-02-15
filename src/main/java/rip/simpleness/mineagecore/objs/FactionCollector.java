@@ -49,13 +49,14 @@ public final class FactionCollector {
 
     public void removeAmount(CollectionType collectionType, int amount) {
         getAmounts().computeIfPresent(collectionType, (collectionType1, integer) -> integer -= amount);
-        getMenuFactionCollector().update(MenuCollector.LOCATIONS.getInt(collectionType), collectionType, getAmounts().get(collectionType));
     }
 
     public void addAmount(CollectionType collectionType, int amount) {
         getAmounts().computeIfPresent(collectionType, (collectionType1, integer) -> integer += amount);
         getAmounts().putIfAbsent(collectionType, 1);
-        getMenuFactionCollector().update(MenuCollector.LOCATIONS.getInt(collectionType), collectionType, getAmounts().getOrDefault(collectionType, 1));
+        if (!getMenuFactionCollector().getInventory().getViewers().isEmpty()) {
+            getMenuFactionCollector().update(MenuCollector.LOCATIONS.getInt(collectionType), collectionType, getAmounts().getOrDefault(collectionType, 1));
+        }
     }
 
     public void reset(CollectionType collectionType) {

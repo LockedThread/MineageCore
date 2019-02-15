@@ -1,7 +1,9 @@
 package rip.simpleness.mineagecore.modules;
 
 import com.google.common.reflect.TypeToken;
+import com.massivecraft.factions.FPlayer;
 import com.massivecraft.factions.FPlayers;
+import com.massivecraft.factions.Faction;
 import me.lucko.helper.Events;
 import me.lucko.helper.event.filter.EventFilters;
 import me.lucko.helper.item.ItemStackBuilder;
@@ -15,7 +17,9 @@ import net.minecraft.server.v1_8_R3.EnumDirection;
 import net.techcable.tacospigot.event.entity.SpawnerPreSpawnEvent;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
@@ -43,7 +47,7 @@ public class ModuleFactionCollector implements TerminableModule {
     public static ItemStack upgradeItemStack, maxUpgradeItemStack, infoItemStack;
     private HashMap<String, FactionCollector> factionCollectorHashMap;
     private GsonStorageHandler<HashMap<String, FactionCollector>> gsonStorageHandler;
-    private CustomItem factionCollectorCustomItem, sellWandCustomCustomItem;
+    private CustomItem factionCollectorCustomItem, sellWandCustomItem, tntWandCustomItem, harvesterHoeCustomItem;
 
     public static ItemStack buildUpgradeItemStack(FactionCollectorUpgrade upgrade) {
         ItemStack clone = upgradeItemStack.clone();
@@ -104,10 +108,28 @@ public class ModuleFactionCollector implements TerminableModule {
                     Block block = event.getBlock();
                     String chunkToString = chunkToString(block.getChunk());
                     final FactionCollector factionCollector = factionCollectorHashMap.get(chunkToString);
-                    if (factionCollector != null && me.lucko.helper.serialize.BlockPosition.of(block).equals(factionCollector.getBlockPosition())) {
-                        factionCollectorHashMap.remove(chunkToString);
-                        event.getPlayer().sendTitle(Title.builder().title(Text.colorize("&aSuccessfully &cremoved &aa collector")).fadeIn(5).fadeOut(5).stay(25).build());
-                        block.getWorld().dropItemNaturally(block.getLocation(), factionCollectorCustomItem.getItemStack());
+                    if (factionCollector != null) {
+                        if (me.lucko.helper.serialize.BlockPosition.of(block).equals(factionCollector.getBlockPosition())) {
+                            factionCollectorHashMap.remove(chunkToString);
+                            event.getPlayer().sendTitle(Title.builder().title(Text.colorize("&aSuccessfully &cremoved &aa collector")).fadeIn(5).fadeOut(5).stay(25).build());
+                            block.getWorld().dropItemNaturally(block.getLocation(), factionCollectorCustomItem.getItemStack());
+                        } else if (event.getBlock().getType() == Material.SUGAR_CANE_BLOCK) {
+                            int a = 0;
+                            Block next = block;
+                            while (next != null && next.getType() == Material.SUGAR_CANE_BLOCK) {
+                                next.getLocation().getBlock().setTypeIdAndData(Material.AIR.getId(), (byte) 0, false);
+                                a += 1;
+                                next = next.getRelative(BlockFace.UP);
+                            }
+
+                            if (harvesterHoeCustomItem.isCustomItem(event.getPlayer().getItemInHand()) && INSTANCE.getRandom().nextBoolean()) {
+                                a *= 2;
+                                event.getPlayer().playSound(event.getPlayer().getLocation(), Sound.VILLAGER_YES, 1f, 1f);
+                                event.getPlayer().sendMessage(Text.colorize("&aYou received 2x sugarcane!"));
+                            }
+                            factionCollector.addAmount(CollectionType.SUGAR_CANE, a);
+                            event.setCancelled(true);
+                        }
                     }
                 }).bindWith(terminableConsumer);
 
@@ -120,7 +142,7 @@ public class ModuleFactionCollector implements TerminableModule {
                     if (factionCollector != null) {
                         event.setCancelled(true);
                         Player player = event.getPlayer();
-                        if (sellWandCustomCustomItem.isCustomItem(event.getItem())) {
+                        if (sellWandCustomItem.isCustomItem(event.getItem())) {
                             double shmoney = factionCollector.getAmounts()
                                     .entrySet()
                                     .stream()
@@ -130,10 +152,26 @@ public class ModuleFactionCollector implements TerminableModule {
                             INSTANCE.getEconomy().depositPlayer(player, shmoney);
                             player.sendTitle(Title.builder().title(Text.colorize("&a&l+$" + shmoney)).fadeIn(5).fadeOut(5).stay(25).build());
                             factionCollector.resetWithBlacklist(CollectionType.TNT);
+                        } else if (tntWandCustomItem.isCustomItem(event.getItem())) {
+                            FPlayer fPlayer = FPlayers.getInstance().getByPlayer(player);
+                            if (fPlayer.hasFaction()) {
+                                Faction faction = fPlayer.getFaction();
+                                final int amount = factionCollector.getAmounts().getOrDefault(CollectionType.TNT, 0);
+                                if (amount == 0) {
+                                    player.sendMessage(Text.colorize("&cYou don't have any tnt to deposit!"));
+                                } else {
+                                    faction.setTntBankBalance(faction.getTntBankBalance() + amount);
+                                    factionCollector.reset(CollectionType.TNT);
+                                    player.sendMessage(Text.colorize("&aYou have deposited &c " + amount + " TNT"));
+                                }
+                            } else {
+                                player.sendMessage(Text.colorize("&cYou need a faction to deposit to your TNTBank."));
+                            }
                         } else if (!FPlayers.getInstance().getByPlayer(player).hasFaction()) {
                             player.sendMessage(Text.colorize("&cYou need a faction to open a collector!"));
                         } else {
                             player.openInventory(factionCollector.getMenuFactionCollector().getInventory());
+                            factionCollector.getAmounts().forEach((key, value) -> factionCollector.getMenuFactionCollector().update(MenuCollector.LOCATIONS.getInt(key), key, value));
                         }
                     }
                 }).bindWith(terminableConsumer);
@@ -175,10 +213,6 @@ public class ModuleFactionCollector implements TerminableModule {
                 }).bindWith(terminableConsumer);
     }
 
-    public HashMap<String, FactionCollector> getFactionCollectorHashMap() {
-        return factionCollectorHashMap;
-    }
-
     private String chunkToString(Chunk chunk) {
         return chunk.getWorld().getName() + ":" + chunk.getX() + ":" + chunk.getZ();
     }
@@ -207,8 +241,27 @@ public class ModuleFactionCollector implements TerminableModule {
         }
         this.factionCollectorCustomItem = new CustomItem("factioncollector", factionCollectorBuilder.build());
 
+        this.harvesterHoeCustomItem = INSTANCE.getConfig().getBoolean("faction-collectors.harvesterhoe-item.enchanted") ? new CustomItem("harvesterhoe", ItemStackBuilder.of(Material.matchMaterial(INSTANCE.getConfig().getString("faction-collectors.harvesterhoe-item.material")))
+                .name(INSTANCE.getConfig().getString("faction-collectors.harvesterhoe-item.name"))
+                .lore(INSTANCE.getConfig().getString("faction-collectors.harvesterhoe-item.lore"))
+                .enchant(Enchantment.ARROW_INFINITE)
+                .flag(ItemFlag.HIDE_ENCHANTS)
+                .build()) : new CustomItem("harvesterhoe", ItemStackBuilder.of(Material.matchMaterial(INSTANCE.getConfig().getString("faction-collectors.harvesterhoe-item.material")))
+                .name(INSTANCE.getConfig().getString("faction-collectors.harvesterhoe-item.name"))
+                .lore(INSTANCE.getConfig().getString("faction-collectors.harvesterhoe-item.lore"))
+                .build());
 
-        this.sellWandCustomCustomItem = INSTANCE.getConfig().getBoolean("faction-collectors.sellwand-item.enchanted") ? new CustomItem("sellwand", ItemStackBuilder.of(Material.matchMaterial(INSTANCE.getConfig().getString("faction-collectors.sellwand-item.material")))
+        this.tntWandCustomItem = INSTANCE.getConfig().getBoolean("faction-collectors.tntwand-item.enchanted") ? new CustomItem("tntwand", ItemStackBuilder.of(Material.matchMaterial(INSTANCE.getConfig().getString("faction-collectors.tntwand-item.material")))
+                .name(INSTANCE.getConfig().getString("faction-collectors.tntwand-item.name"))
+                .lore(INSTANCE.getConfig().getString("faction-collectors.tntwand-item.lore"))
+                .enchant(Enchantment.ARROW_INFINITE)
+                .flag(ItemFlag.HIDE_ENCHANTS)
+                .build()) : new CustomItem("tntwand", ItemStackBuilder.of(Material.matchMaterial(INSTANCE.getConfig().getString("faction-collectors.tntwand-item.material")))
+                .name(INSTANCE.getConfig().getString("faction-collectors.tntwand-item.name"))
+                .lore(INSTANCE.getConfig().getString("faction-collectors.tntwand-item.lore"))
+                .build());
+
+        this.sellWandCustomItem = INSTANCE.getConfig().getBoolean("faction-collectors.sellwand-item.enchanted") ? new CustomItem("sellwand", ItemStackBuilder.of(Material.matchMaterial(INSTANCE.getConfig().getString("faction-collectors.sellwand-item.material")))
                 .name(INSTANCE.getConfig().getString("faction-collectors.sellwand-item.name"))
                 .lore(INSTANCE.getConfig().getString("faction-collectors.sellwand-item.lore"))
                 .enchant(Enchantment.ARROW_INFINITE)
