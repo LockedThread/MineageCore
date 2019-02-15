@@ -10,24 +10,143 @@ scoreboard:
 vouchers:
   protein:
     commands:
-      - '@broadcast {player} has won a protein tag!'
+      - 'broadcast {player} has won a protein tag!'
     item:
       name: '&cProtein'
       material: 'NAME_TAG'
       lore:
         - '&eRight click to redeem the Protein tag'
+  fix-all:
+    commands:
+      - 'broadcast &a{player} &ehas redeemed /fixall!'
+      - 'perm user {player} group add perk-fixall'
+    item:
+      name: '&a/FixAll'
+      material: 'NAME_TAG'
+      lore:
+        - '&eRight click to redeem the Fix all command'
+  fix-hand:
+    commands:
+      - 'broadcast &a{player} &ehas redeemed /fixhand!'
+      - 'perm user {player} group add perk-fixhand'
+    item:
+      name: '&a/FixHand'
+      material: 'NAME_TAG'
+      lore:
+        - '&eRight click to redeem the Fix Hand command'
+  villager:
+    commands:
+      - 'broadcast &a{player} &ehas redeemed Villager Rank!'
+    item:
+      name: '&eVillager Rank'
+      material: 'PAPER'
+      lore:
+        - '&eRight click to redeem Villager Rank'
+        - '&cThese will not replace your current rank if you are higher than Villager!'
+  knight:
+    commands:
+      - 'broadcast &a{player} &ehas redeemed Knight Rank!'
+    item:
+      name: '&6Knight Rank'
+      material: 'PAPER'
+      lore:
+        - '&eRight click to redeem Knight Rank'
+        - '&cThese will not replace your current rank if you are higher than Knight!'
+  king:
+    commands:
+      - 'broadcast &a{player} &ehas redeemed King Rank!'
+    item:
+      name: '&9King Rank'
+      material: 'PAPER'
+      lore:
+        - '&eRight click to redeem King Rank'
+        - '&cThese will not replace your current rank if you are higher than King!'
+  god:
+    commands:
+      - 'broadcast &a{player} &ehas redeemed God Rank!'
+    item:
+      name: '&bGod Rank'
+      material: 'PAPER'
+      lore:
+        - '&eRight click to redeem God Rank'
+        - '&cThese will not replace your current rank if you are higher than God!'
+  overseer:
+    commands:
+      - 'broadcast &a{player} &ehas redeemed Overseer Rank!'
+    item:
+      name: '&dOverseer Rank'
+      material: 'PAPER'
+      lore:
+        - '&eRight click to redeem Overseer Rank'
+        - '&cThese will not replace your current rank if you are higher than Overseer!'
+  zeus:
+    commands:
+      - 'broadcast &a{player} &ehas redeemed Zeus Rank!'
+    item:
+      name: '&cZeus'
+      material: 'PAPER'
+      lore:
+        - '&eRight click to redeem Zeus Rank'
+        - '&cThese will not replace your current rank if you are higher than Zeus!'
+  endergod:
+    commands:
+      - 'broadcast &a{player} &ehas redeemed Endergod Rank!'
+    item:
+      name: '&5ndergod Rank'
+      material: 'PAPER'
+      lore:
+        - '&eRight click to redeem Endergod Rank'
+        - '&cThese will not replace your current rank if you are higher than Endergod!'
+  witherking:
+    commands:
+      - 'broadcast &a{player} &ehas redeemed Witherking Rank!'
+    item:
+      name: '&3&lWither&7&lking &3Rank'
+      material: 'PAPER'
+      lore:
+        - '&eRight click to redeem Witherking Rank'
+        - '&cThese will not replace your current rank if you are higher than Witherking!'
+  netherlord:
+    commands:
+      - 'broadcast &a{player} &ehas redeemed Netherlord Rank!'
+    item:
+      name: '&4&lNether&6&llord &4Rank'
+      material: 'PAPER'
+      lore:
+        - '&eRight click to redeem Netherlord Rank'
+        - '&cThese will not replace your current rank if you are higher than Netherlord!'
 faction-collectors:
   collector-item:
     name: '&bFaction Collector'
     enchanted: true
     lore:
-      - '&ePlace this down in your claims to start collecting mobs.'
+      - ''
+      - '&dPlace this down in your claims to start collecting mobs.'
+      - ''
   sellwand-item:
     name: '&eSell Wand'
     material: 'DIAMOND_HOE'
     enchanted: true
     lore:
-      - '&eRight click a collector to sell all of the mobs.'
+      - ''
+      - '&dRight click a collector to sell all of the mobs.'
+      - ''
+  tntwand-item:
+    name: '&cTNT Wand'
+    material: 'GOLD_HOE'
+    enchanted: false
+    lore:
+      - ''
+      - '&dRight click a collector to deposit all of the tnt.'
+      - ''
+  harvesterhoe-item:
+    name: '&bHarvester Hoe'
+    material: 'DIAMOND_HOE'
+    enchanted: true
+    lore:
+      - ''
+      - '&dBreak sugar cane to and have a chance to receieve double the amount!'
+      - ''
   gui:
     items:
       info:
