@@ -1,3 +1,20 @@
+sotw: true
+moneypouches:
+  1:
+    min: 1000.0
+    max: 50000.0
+  2:
+    min: 50000.0
+    max: 100000.0
+  3:
+    min: 500000.0
+    max: 1000000.0
+  4:
+    min: 2500000.0
+    max: 5000000.0
+  5:
+    min: 5000000.0
+    max: 10000000.0
 scoreboard:
   display-name: '&f» &e&lMineage&6&lPVP &f«'
   lines:
