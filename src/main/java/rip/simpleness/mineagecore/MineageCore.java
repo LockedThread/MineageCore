@@ -86,20 +86,29 @@ public final class MineageCore extends ExtendedJavaPlugin {
                 .stream()
                 .flatMap(shop -> shop.getShopItems().stream())
                 .forEach(item -> {
-                    if (item.getItem().getType() == Material.STRING) {
-                        prices.put(Material.TRIPWIRE, item.getBuyPriceForAmount(1));
-                    } else if (item.getItem().getType().name().startsWith("DIODE")) {
-                        prices.put(Material.DIODE, item.getBuyPriceForAmount(1));
-                        prices.put(Material.DIODE_BLOCK_OFF, item.getBuyPriceForAmount(1));
-                        prices.put(Material.DIODE_BLOCK_ON, item.getBuyPriceForAmount(1));
-                    } else if (item.getItem().getType() == Material.REDSTONE) {
-                        prices.put(Material.REDSTONE_WIRE, item.getBuyPriceForAmount(1));
-                    } else if (item.getItem().getType() == Material.REDSTONE_COMPARATOR) {
-                        prices.put(Material.REDSTONE_COMPARATOR, item.getBuyPriceForAmount(1));
-                        prices.put(Material.REDSTONE_COMPARATOR_OFF, item.getBuyPriceForAmount(1));
-                        prices.put(Material.REDSTONE_COMPARATOR_ON, item.getBuyPriceForAmount(1));
-                    } else {
-                        prices.put(item.getItem().getType(), item.getBuyPriceForAmount(1));
+                    switch (item.getItem().getType()) {
+                        case STRING:
+                            prices.put(Material.TRIPWIRE, item.getBuyPriceForAmount(1));
+                            break;
+                        case DIODE:
+                            prices.put(Material.DIODE, item.getBuyPriceForAmount(1));
+                            break;
+                        case DIODE_BLOCK_OFF:
+                            prices.put(Material.DIODE_BLOCK_OFF, item.getBuyPriceForAmount(1));
+                            break;
+                        case DIODE_BLOCK_ON:
+                            prices.put(Material.DIODE_BLOCK_ON, item.getBuyPriceForAmount(1));
+                            break;
+                        case REDSTONE:
+                            prices.put(Material.REDSTONE_WIRE, item.getBuyPriceForAmount(1));
+                            break;
+                        case REDSTONE_COMPARATOR:
+                            prices.put(Material.REDSTONE_COMPARATOR, item.getBuyPriceForAmount(1));
+                            prices.put(Material.REDSTONE_COMPARATOR_OFF, item.getBuyPriceForAmount(1));
+                            prices.put(Material.REDSTONE_COMPARATOR_ON, item.getBuyPriceForAmount(1));
+                            break;
+                        default:
+                            prices.put(item.getItem().getType(), item.getBuyPriceForAmount(1));
                     }
                 });
 
@@ -116,6 +125,8 @@ public final class MineageCore extends ExtendedJavaPlugin {
         bindModule(new ModulePrinterMode());
         bindModule(new ModuleScoreboard());
         bindModule(new ModuleFixes());
+        bindModule(new ModuleSOTW());
+        bindModule(new ModuleMoneyPouch());
 
         getServer().getPluginManager().registerEvents(new MenuListener(), this);
     }
