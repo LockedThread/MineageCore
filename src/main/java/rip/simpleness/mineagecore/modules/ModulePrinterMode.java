@@ -64,7 +64,7 @@ public class ModulePrinterMode implements TerminableModule {
                         disablePrinter(player);
                     } else if (!playerInventoryIsEmpty(player)) {
                         player.sendMessage(Text.colorize(MineageCore.SERVER_PREFIX + "&eYour inventory and armor must be empty to enable printer!"));
-                    } else if (MineageCore.getInstance().canBuild(player, player.getLocation())) {
+                    } else if (!MineageCore.getInstance().canBuild(player, player.getLocation())) {
                         player.sendMessage(Text.colorize("&cYou must be in friendly territory to activate /printer!"));
                     } else {
                         enablePrinter(player);
@@ -113,7 +113,7 @@ public class ModulePrinterMode implements TerminableModule {
                 .filter(EventFilters.ignoreSameChunk())
                 .filter(event -> printingPlayers.contains(event.getPlayer().getUniqueId()))
                 .handler(event -> {
-                    if (MineageCore.getInstance().canBuild(event.getPlayer(), event.getTo()))
+                    if (!MineageCore.getInstance().canBuild(event.getPlayer(), event.getTo()))
                         disablePrinter(event.getPlayer());
                 })
                 .bindWith(terminableConsumer);
