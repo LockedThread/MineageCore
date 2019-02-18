@@ -13,7 +13,7 @@ import javax.annotation.Nonnull;
 
 public class ModuleBlockCommands implements TerminableModule {
 
-    private ImmutableSet<String> blockedCommands = ImmutableSet.<String>builder().add("/plugins", "/pl", "/?", "/icanhasbukkit", "/version", ":", "minecraft", "bukkit").build();
+    private ImmutableSet<String> blockedCommands = ImmutableSet.<String>builder().add("/plugins", "/pl", "/?", "/icanhasbukkit", "/version", ":", "minecraft", "bukkit", "help").build();
 
     @Override
     public void setup(@Nonnull TerminableConsumer terminableConsumer) {
