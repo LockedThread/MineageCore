@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 public class ModuleGoldenApples implements TerminableModule {
 
     private CooldownMap<UUID> goldenAppleCooldownMap = CooldownMap.create(Cooldown.of(30, TimeUnit.SECONDS));
-    private CooldownMap<UUID> godAppleCooldownMap = CooldownMap.create(Cooldown.of(120, TimeUnit.SECONDS));
+    private CooldownMap<UUID> godAppleCooldownMap = CooldownMap.create(Cooldown.of(3, TimeUnit.MINUTES));
 
     @Override
     public void setup(@Nonnull TerminableConsumer terminableConsumer) {
@@ -28,23 +28,15 @@ public class ModuleGoldenApples implements TerminableModule {
                 .handler(event -> {
                     Player player = event.getPlayer();
                     if (event.getItem().getDurability() == 0) {
-                        final boolean b = goldenAppleCooldownMap.testSilently(player.getUniqueId());
-                        System.out.println(b);
-                        System.out.println("checked for not" + b);
-                        if (!player.hasPermission("mineage.goldenapplebypass"))
-                            if (!goldenAppleCooldownMap.testSilently(player.getUniqueId())) {
-                                event.setCancelled(true);
-                                player.sendMessage(Text.colorize(MineageCore.SERVER_PREFIX + "&cYou cannot eat another golden apple for " + TimeUtil.toLongForm(goldenAppleCooldownMap.remainingTime(player.getUniqueId(), TimeUnit.SECONDS))));
-                            } else {
-                                goldenAppleCooldownMap.put(player.getUniqueId(), goldenAppleCooldownMap.getBase());
-                            }
-                    } else if (!player.hasPermission("mineage.godapplebypass"))
-                        if (!godAppleCooldownMap.testSilently(player.getUniqueId())) {
+                        if (!player.hasPermission("mineage.goldenapplebypass") && goldenAppleCooldownMap.testSilently(player.getUniqueId())) {
                             event.setCancelled(true);
-                            player.sendMessage(Text.colorize(MineageCore.SERVER_PREFIX + "&cYou cannot eat another god apple for " + TimeUtil.toLongForm(godAppleCooldownMap.remainingTime(event.getPlayer().getUniqueId(), TimeUnit.SECONDS))));
-                        } else {
-                            godAppleCooldownMap.put(player.getUniqueId(), godAppleCooldownMap.getBase());
+                            System.out.println("in map");
+                            player.sendMessage(Text.colorize(MineageCore.SERVER_PREFIX + "&cYou cannot eat another golden apple for " + TimeUtil.toLongForm(goldenAppleCooldownMap.remainingTime(player.getUniqueId(), TimeUnit.SECONDS))));
                         }
+                    } else if (!player.hasPermission("mineage.godapplebypass") && godAppleCooldownMap.testSilently(player.getUniqueId())) {
+                        event.setCancelled(true);
+                        player.sendMessage(Text.colorize(MineageCore.SERVER_PREFIX + "&cYou cannot eat another god apple for " + TimeUtil.toLongForm(godAppleCooldownMap.remainingTime(event.getPlayer().getUniqueId(), TimeUnit.SECONDS))));
+                    }
                 }).bindWith(terminableConsumer);
     }
 }
