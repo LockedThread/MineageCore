@@ -32,6 +32,7 @@ public class ModuleMoneyPouch implements TerminableModule {
                     for (MoneyPouch moneyPouch : moneyPouches) {
                         if (moneyPouch.getCustomItem().isCustomItem(event.getItem())) {
                             moneyPouch.open(event.getPlayer());
+                            event.setCancelled(true);
                             return;
                         }
                     }

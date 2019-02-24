@@ -11,6 +11,7 @@ import me.lucko.helper.plugin.ap.PluginDependency;
 import me.lucko.helper.scoreboard.PacketScoreboardProvider;
 import net.brcdev.shopgui.ShopGuiPlugin;
 import net.milkbowl.vault.economy.Economy;
+import net.milkbowl.vault.permission.Permission;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -37,7 +38,9 @@ import java.util.stream.Collectors;
                 @PluginDependency(value = "WorldGuard"),
                 @PluginDependency("ShopGUIPlus"),
                 @PluginDependency("ProtocolLib"),
-                @PluginDependency("helper")})
+                @PluginDependency("helper"),
+                @PluginDependency("SimpleOutpost"),
+                @PluginDependency("SimpleEssentials")})
 public final class MineageCore extends ExtendedJavaPlugin {
 
     public static final String SERVER_PREFIX = "&8[&e&lMineage&6&lPVP&8] ";
@@ -48,6 +51,7 @@ public final class MineageCore extends ExtendedJavaPlugin {
     private GenerationTask generationTask;
     private EnumMap<Material, Double> prices;
     private PacketScoreboardProvider packetScoreboardProvider;
+    private Permission permission;
 
     public static MineageCore getInstance() {
         return getPlugin(MineageCore.class);
@@ -112,6 +116,7 @@ public final class MineageCore extends ExtendedJavaPlugin {
                     }
                 });
 
+        this.permission = getServer().getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class).getProvider();
         this.packetScoreboardProvider = provideService(PacketScoreboardProvider.class, new PacketScoreboardProvider(this));
 
         bindModule(new ModuleJellyLegs());
@@ -171,5 +176,9 @@ public final class MineageCore extends ExtendedJavaPlugin {
 
     public PacketScoreboardProvider getPacketScoreboardProvider() {
         return packetScoreboardProvider;
+    }
+
+    public Permission getPermission() {
+        return permission;
     }
 }

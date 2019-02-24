@@ -19,6 +19,7 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
@@ -219,6 +220,16 @@ public class ModulePrinterMode implements TerminableModule {
                     event.setDroppedExp(0);
                 })
                 .bindWith(terminableConsumer);
+
+        Events.subscribe(BlockBreakEvent.class)
+                .filter(EventFilters.ignoreCancelled())
+                .filter(event -> printingPlayers.contains(event.getPlayer().getUniqueId()))
+                .filter(event -> BANNED_INTERACTABLES.contains(event.getBlock().getType()))
+                .handler(event -> {
+                    if (BANNED_INTERACTABLES.contains(event.getBlock().getType()) || event.getBlock().getY() < 1) {
+                        event.setCancelled(true);
+                    }
+                }).bindWith(terminableConsumer);
 
 
         Schedulers.bukkit().runTaskTimer(MineageCore.getInstance(), () -> {

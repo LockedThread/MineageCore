@@ -16,6 +16,7 @@ import rip.simpleness.mineagecore.enums.CollectionType;
 import rip.simpleness.mineagecore.enums.FactionCollectorUpgrade;
 import rip.simpleness.mineagecore.modules.ModuleFactionCollector;
 import rip.simpleness.mineagecore.objs.FactionCollector;
+import rip.simpleness.outpost.SimpleOutpost;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -77,6 +78,14 @@ public class MenuCollector extends Menu {
                             faction.setTntBankBalance(faction.getTntBankBalance() + amountToBeSubtracted);
                         } else {
                             double shmoney = (collectionType.getValue() * amountToBeSubtracted);
+
+                            shmoney *= SimpleOutpost.getInstance().getOutpostHashMap()
+                                    .values()
+                                    .stream()
+                                    .filter(outpost -> outpost.getFaction().getOnlinePlayers().contains(player))
+                                    .mapToDouble(outpost -> 2)
+                                    .reduce(1, (a, b) -> a * b);
+
                             INSTANCE.getEconomy().depositPlayer(player, shmoney);
                             player.sendTitle(Title.builder().title(Text.colorize("&a&l+$" + shmoney)).fadeIn(5).fadeOut(5).stay(25).build());
                         }

@@ -19,20 +19,91 @@ scoreboard:
   display-name: '&f» &e&lMineage&6&lPVP &f«'
   lines:
     - '&7&m------------------------'
-    - '&dBalance: &e${balance}'
-    - '&dFaction: &e{faction_name}'
-    - '&dTPS: &e{tps}'
-    - '&dDiscord: &ediscord.gg/eMhFHSp'
+    - '&7• &6&lTPS '
+    - '  &f{tps}'
+    - ''
+    - '&7• &6&lRank'
+    - '  &f{rank}'
+    - ''
+    - '&7• &6&lFaction'
+    - '  &f{faction_name}'
+    - ''
+    - '&7• &6&lBalance'
+    - '  &f{balance}'
     - '&7&m-----------&7&m-------------'
 vouchers:
-  protein:
+  proteintag:
     commands:
-      - 'broadcast {player} has won a protein tag!'
+      - 'broadcast {player} has redeemed the protein tag!'
+      - 'lp user {player} permission set deluxetags.tag.protein'
     item:
-      name: '&cProtein'
+      name: '&8[&c&lPrOtEiN&8] &8Tag'
       material: 'NAME_TAG'
       lore:
-        - '&eRight click to redeem the Protein tag'
+        - '&eRight click to redeem the Protein tag!'
+  stickytag:
+    commands:
+      - 'broadcast {player} has redeemed the PvPEvent tag!'
+      - 'lp user {player} permission set deluxetags.tag.sticky'
+    item:
+      name: '&8[&c&lPvPEvent&8] &8Tag'
+      material: 'NAME_TAG'
+      lore:
+        - '&eRight click to redeem the Sticky tag!'
+  scootertag:
+    commands:
+      - 'broadcast {player} has redeemed the Scooter tag!'
+      - 'lp user {player} permission set deluxetags.tag.scooter'
+    item:
+      name: '&8[&d&lScooter&8] &8Tag'
+      material: 'NAME_TAG'
+      lore:
+        - '&eRight click to redeem the Scooter tag!'
+  salttag:
+    commands:
+      - 'broadcast {player} has redeemed the Salt tag!'
+      - 'lp user {player} permission set deluxetags.tag.salt'
+    item:
+      name: '&8[&f&lSalt&8] &8Tag'
+      material: 'NAME_TAG'
+      lore:
+        - '&eRight click to redeem the Salt tag!'
+  getraidedtag:
+    commands:
+      - 'broadcast {player} has redeemed the GetRaided tag!'
+      - 'lp user {player} permission set deluxetags.tag.getraided'
+    item:
+      name: '&8[&a&lGet&2&lRaided&8] &8Tag'
+      material: 'NAME_TAG'
+      lore:
+        - '&eRight click to redeem the GetRaided tag!'
+  raideventtag:
+    commands:
+      - 'broadcast {player} has redeemed the RaidEvent tag!'
+      - 'lp user {player} permission set deluxetags.tag.raidevent'
+    item:
+      name: '&8[&e&lRaidEvent&8] &8Tag'
+      material: 'NAME_TAG'
+      lore:
+        - '&eRight click to redeem the RaidEvent tag!'
+  pvpeventtag:
+    commands:
+      - 'broadcast {player} has redeemed the PvPEvent tag!'
+      - 'lp user {player} permission set deluxetags.tag.pvpevent'
+    item:
+      name: '&8[&c&lPvPEvent&8] &8Tag'
+      material: 'NAME_TAG'
+      lore:
+        - '&eRight click to redeem the PvPEvent tag!'
+  ogtag:
+    commands:
+      - 'broadcast {player} has redeemed the OG tag!'
+      - 'lp user {player} permission set deluxetags.tag.og'
+    item:
+      name: '&8[&a&lO&2&lG&8] &8Tag'
+      material: 'NAME_TAG'
+      lore:
+        - '&eRight click to redeem the OG tag!'
   fix-all:
     commands:
       - 'broadcast &a{player} &ehas redeemed /fixall!'

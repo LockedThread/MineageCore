@@ -1,10 +1,13 @@
 package rip.simpleness.mineagecore.modules;
 
+import com.massivecraft.factions.P;
+import com.massivecraft.factions.util.FlightDisableUtil;
 import me.lucko.helper.Commands;
 import me.lucko.helper.Events;
 import me.lucko.helper.event.filter.EventFilters;
 import me.lucko.helper.terminable.TerminableConsumer;
 import me.lucko.helper.terminable.module.TerminableModule;
+import me.lucko.helper.text.Text;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
@@ -55,17 +58,19 @@ public class ModuleSOTW implements TerminableModule {
                             commandContext.reply("&cYou have turned SOTW " + root);
                             Bukkit.broadcastMessage(" ");
                             Bukkit.broadcastMessage(" ");
-                            Bukkit.broadcastMessage("&cTNT, Creeper Eggs, and Explosions are now &a&lENABLED");
+                            Bukkit.broadcastMessage(Text.colorize("&cTNT, Creeper Eggs, and Explosions are now &a&lENABLED"));
                             Bukkit.broadcastMessage(" ");
                             Bukkit.broadcastMessage(" ");
                             this.sotw = true;
+                            P.p.flightTask = new FlightDisableUtil().runTaskTimer(P.p, 0, 40);
                         } else if (root.equalsIgnoreCase("off")) {
                             commandContext.reply("&cYou have turned SOTW " + root);
                             Bukkit.broadcastMessage(" ");
                             Bukkit.broadcastMessage(" ");
-                            Bukkit.broadcastMessage("&cTNT, Creeper Eggs, and Explosions are now &c&lDISABLED");
+                            Bukkit.broadcastMessage(Text.colorize("&cTNT, Creeper Eggs, and Explosions are now &c&lDISABLED"));
                             Bukkit.broadcastMessage(" ");
                             Bukkit.broadcastMessage(" ");
+                            P.p.flightTask.cancel();
                             this.sotw = false;
                         } else {
                             commandContext.reply("&e/sotw [on/off]");

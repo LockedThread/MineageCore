@@ -11,7 +11,6 @@ public class MenuIcon {
     private ItemStack itemStack;
     private Consumer<InventoryClickEvent> event;
 
-
     public MenuIcon(ItemStack itemStack, Consumer<InventoryClickEvent> event) {
         this.event = event;
         this.itemStack = itemStack;

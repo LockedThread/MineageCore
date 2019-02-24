@@ -32,7 +32,7 @@ public class ModuleJellyLegs implements TerminableModule {
 
         Commands.create()
                 .assertPlayer()
-                .assertPermission("mineagepvp.nightvision")
+                .assertPermission("mineagepvp.jellylegs")
                 .handler(command -> {
                     Player player = command.sender();
                     if (jellyLegsUUIDs.contains(player.getUniqueId())) {

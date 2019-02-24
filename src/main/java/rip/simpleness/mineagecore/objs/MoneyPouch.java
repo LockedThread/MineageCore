@@ -1,6 +1,7 @@
 package rip.simpleness.mineagecore.objs;
 
 import me.lucko.helper.item.ItemStackBuilder;
+import me.lucko.helper.text.Text;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -43,11 +44,11 @@ public class MoneyPouch {
         } else {
             hand.setAmount(hand.getAmount() - 1);
         }
-        final double money = getRandomMoney();
+        final double money = (int) getRandomMoney();
         player.sendTitle(Title.builder()
                 .fadeOut(20)
                 .fadeIn(20)
-                .title("&a+" + money)
+                .title(Text.colorize("&a+" + money))
                 .build());
 
         MineageCore.getInstance().getEconomy().depositPlayer(player, money);

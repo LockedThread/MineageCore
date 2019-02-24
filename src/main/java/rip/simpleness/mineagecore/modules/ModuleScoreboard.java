@@ -3,6 +3,7 @@ package rip.simpleness.mineagecore.modules;
 import com.google.common.collect.Lists;
 import com.massivecraft.factions.FPlayer;
 import com.massivecraft.factions.FPlayers;
+import me.lucko.helper.Commands;
 import me.lucko.helper.Events;
 import me.lucko.helper.Schedulers;
 import me.lucko.helper.metadata.Metadata;
@@ -24,8 +25,6 @@ import org.bukkit.scoreboard.DisplaySlot;
 import rip.simpleness.mineagecore.MineageCore;
 
 import javax.annotation.Nonnull;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -42,6 +41,26 @@ public class ModuleScoreboard implements TerminableModule {
     private PacketScoreboard scoreboard;
     private List<String> scoreboardLines;
     private String scoreboardDisplayName;
+
+    public static String getFormattedNumber(double value) {
+        if (value <= 999) {
+            return String.valueOf(value);
+        }
+
+        final String[] units = new String[]{"", "K", "M", "B", "T", "Q"};
+        int digitGroups = (int) (Math.log10(value) / Math.log10(1000));
+        return new DecimalFormat("#,##0.#").format(value / Math.pow(1000, digitGroups)) + "" + units[digitGroups];
+    }
+
+    public static void disableScoreboard(Player player) {
+        disabledScordboard.add(player.getUniqueId());
+        Metadata.provideForPlayer(player).getOrNull(SCOREBOARD_OBJECTIVE_METADATA_KEY).unsubscribe(player);
+    }
+
+    public static void enableScoreboard(Player player) {
+        disabledScordboard.remove(player.getUniqueId());
+        Metadata.provideForPlayer(player).getOrNull(SCOREBOARD_OBJECTIVE_METADATA_KEY).subscribe(player);
+    }
 
     @Override
     public void setup(@Nonnull TerminableConsumer terminableConsumer) {
@@ -64,29 +83,51 @@ public class ModuleScoreboard implements TerminableModule {
                 if (line.isEmpty()) {
                     map.put(StringUtils.repeat(" ", i), i);
                 } else {
-                    map.put(line.replace("{faction_name}", fPlayer.hasFaction() ? fPlayer.getFaction().getTag() : "&2Wilderness").replace("{balance}", new BigDecimal(INSTANCE.getEconomy().getBalance(player)).setScale(2, RoundingMode.DOWN).toString()).replace("{tps}", new DecimalFormat("#.##").format(Tps.read().avg1())), i);
+                    String group = INSTANCE.getPermission().getPrimaryGroup(player);
+                    map.put(line.replace("{rank}", group.equalsIgnoreCase("default") ? "Member" : StringUtils.capitalize(group))
+                            .replace("{faction_name}", fPlayer.hasFaction() ? fPlayer.getFaction().getTag() : "&2Wilderness")
+                            .replace("{balance}", getFormattedNumber(INSTANCE.getEconomy().getBalance(player)))
+                            .replace("{tps}", new DecimalFormat("#.##").format(Tps.read().avg1()))
+                            .replace("{online}", String.valueOf(Players.all().size())), i);
                 }
             }
             scoreboardObjective.applyScores(map);
         };
 
+        Commands.create()
+                .assertPlayer()
+                .assertPermission("mineage.togglescoreboard")
+                .handler(commandContext -> {
+                    ScoreboardObjective scoreboardObjective = Metadata.provideForPlayer(commandContext.sender()).getOrNull(SCOREBOARD_OBJECTIVE_METADATA_KEY);
+                    if (disabledScordboard.contains(commandContext.sender().getUniqueId())) {
+                        disabledScordboard.remove(commandContext.sender().getUniqueId());
+                        scoreboardObjective.subscribe(commandContext.sender());
+                        commandContext.reply("&eYou have &aenabled &eyour scoreboard!");
+                    } else {
+                        disabledScordboard.add(commandContext.sender().getUniqueId());
+                        commandContext.reply("&eYou have &cdisabled &eyour scoreboard!");
+                    }
+                    updater.accept(commandContext.sender(), scoreboardObjective);
+                }).registerAndBind(terminableConsumer, "togglesc", "scoreboard", "scoreboardtoggle", "togglescoreboard");
+
+
         Events.subscribe(PlayerChangedWorldEvent.class)
                 .handler(event -> updater.accept(event.getPlayer(), Metadata.provideForPlayer(event.getPlayer()).getOrNull(SCOREBOARD_OBJECTIVE_METADATA_KEY))).bindWith(terminableConsumer);
 
         Events.subscribe(PlayerJoinEvent.class, EventPriority.HIGHEST)
-                .handler(event -> Schedulers.sync().runLater(() -> {
-                    final Player player = event.getPlayer();
+                .handler(event -> {
+                    Player player = event.getPlayer();
                     final ScoreboardObjective scoreboardObjective = scoreboard.createPlayerObjective(player, "null", DisplaySlot.SIDEBAR);
                     Metadata.provideForPlayer(player).put(SCOREBOARD_OBJECTIVE_METADATA_KEY, scoreboardObjective);
                     updater.accept(player, scoreboardObjective);
-                }, 4)).bindWith(terminableConsumer);
+                }).bindWith(terminableConsumer);
+
 
         Events.subscribe(PlayerQuitEvent.class)
-                .handler(event -> Metadata.provideForPlayer(event.getPlayer()).remove(SCOREBOARD_OBJECTIVE_METADATA_KEY)).bindWith(terminableConsumer);
+                .handler(event -> Metadata.provideForPlayer(event.getPlayer()).remove(SCOREBOARD_OBJECTIVE_METADATA_KEY))
+                .bindWith(terminableConsumer);
 
-        Schedulers.async().runRepeating(() -> Players.all().forEach(player -> {
-            updater.accept(player, Metadata.provideForPlayer(player).getOrNull(SCOREBOARD_OBJECTIVE_METADATA_KEY));
-        }), 100L, 100L);
+        Schedulers.async().runRepeating(() -> Players.all().forEach(player -> updater.accept(player, Metadata.provideForPlayer(player).getOrNull(SCOREBOARD_OBJECTIVE_METADATA_KEY))), 100L, 100L);
     }
 
     public HashSet<UUID> getDisabledScordboard() {

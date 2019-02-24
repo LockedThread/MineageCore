@@ -94,6 +94,9 @@ public class ModuleFactionCollector implements TerminableModule {
                     if (factionCollectorHashMap.containsKey(chunkToString(chunk))) {
                         event.setCancelled(true);
                         player.sendTitle(Title.builder().title(Text.colorize("&cThere's already a collector in the chunk")).fadeIn(5).fadeOut(5).stay(25).build());
+                    } else if (event.getBlockPlaced().getY() < 150) {
+                        event.setCancelled(true);
+                        player.sendMessage(Text.colorize("&cYou must place your faction collector above y150"));
                     } else {
                         factionCollectorHashMap.put(chunkToString(chunk), new FactionCollector(event.getBlockPlaced().getLocation()));
                         player.sendTitle(Title.builder().title(Text.colorize("&aYou have placed a Collector")).fadeIn(5).fadeOut(5).stay(25).build());
@@ -113,6 +116,8 @@ public class ModuleFactionCollector implements TerminableModule {
                             factionCollectorHashMap.remove(chunkToString);
                             event.getPlayer().sendTitle(Title.builder().title(Text.colorize("&aSuccessfully &cremoved &aa collector")).fadeIn(5).fadeOut(5).stay(25).build());
                             block.getWorld().dropItemNaturally(block.getLocation(), factionCollectorCustomItem.getItemStack());
+                            block.setType(Material.AIR);
+                            event.setCancelled(true);
                         } else if (event.getBlock().getType() == Material.SUGAR_CANE_BLOCK) {
                             int a = 0;
                             Block next = block;
@@ -200,8 +205,8 @@ public class ModuleFactionCollector implements TerminableModule {
                 .filter(EventFilters.ignoreCancelled())
                 .handler(event -> {
                     final FactionCollector collector = factionCollectorHashMap.get(chunkToString(event.getLocation().getChunk()));
-                    event.setCancelled(true);
                     if (collector != null && collector.getFactionCollectorUpgrade().getApplicables().contains(CollectionType.fromEntityType(event.getSpawnedType()))) {
+                        event.setCancelled(true);
                         if (event.getSpawnedType() == EntityType.CREEPER) {
                             if (MineageCore.getInstance().getRandom().nextBoolean()) {
                                 collector.addAmount(CollectionType.TNT, 1);
